@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "335473906576",
+    "project_id": "compoundapp-7a94",
+    "storage_bucket": "compoundapp-7a94.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:335473906576:android:5ed1e2424f422540d4d915",
+        "android_client_info": {
+          "package_name": "com.example.bills_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgNLMqhsfN-ACrLSZuE__w5AN-GlIIGRo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
