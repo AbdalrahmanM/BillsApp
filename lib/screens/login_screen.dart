@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../screens/home_screen.dart'; // تأكد من المسار الصحيح
 
 class LoginScreen extends StatefulWidget {
@@ -95,6 +96,110 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
+  void _showHelpModal() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [Color(0xFFFFB300), Color(0xFF8D6E63)],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0x338D6E63),
+                      blurRadius: 16,
+                      offset: Offset(0, 8),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(20),
+                child: const Icon(
+                  Icons.headset_mic,
+                  color: Colors.white,
+                  size: 44,
+                ),
+              ),
+              const SizedBox(height: 18),
+              const Text(
+                "We're Here for You",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF6D4C41)),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                "Our support team is here to assist you at any time.",
+                style: TextStyle(fontSize: 16, color: Color(0xFF8D6E63)),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 28),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _launchEmail();
+                    },
+                    icon: const Icon(Icons.email_outlined),
+                    label: const Text('Contact via Email'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6D4C41),
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size.fromHeight(48),
+                      textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  // TODO: Implement feedback action
+                },
+                child: const Text(
+                  'Send Feedback',
+                  style: TextStyle(color: Color(0xFF8D6E63)),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _launchEmail() async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: 'abdodj9425@gmail.com',
+      query: 'subject=Support%20Request',
+    );
+    if (await canLaunchUrl(emailUri)) {
+      await launchUrl(emailUri);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No email app found. Please install or configure an email app.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -140,7 +245,18 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                 ),
               ),
-              const SizedBox(height: 60),
+              // Add Get help button before login
+              const SizedBox(height: 16),
+              Center(
+                child: TextButton(
+                  onPressed: _showHelpModal,
+                  child: const Text(
+                    "Get help",
+                    style: TextStyle(color: Colors.purple),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 44),
             ],
           ),
 
@@ -257,7 +373,7 @@ class _LoginScreenState extends State<LoginScreen>
                       const SizedBox(height: 20),
                       Center(
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: _showHelpModal,
                           child: const Text(
                             "Get help",
                             style: TextStyle(color: Colors.purple),

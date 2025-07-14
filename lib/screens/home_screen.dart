@@ -1,5 +1,7 @@
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'bill_details_screen.dart'; // تأكد من وجود هذه الصفحة
 
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -18,6 +20,140 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  void _launchEmail() async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: 'abdodj9425@gmail.com',
+      query: 'subject=Support%20Request',
+    );
+    if (await canLaunchUrl(emailUri)) {
+      await launchUrl(emailUri);
+    }
+  }
+
+  void _launchWhatsApp() async {
+    const phone = '966500000000'; // default phone number
+    final Uri whatsappUri = Uri.parse('https://wa.me/$phone');
+    if (await canLaunchUrl(whatsappUri)) {
+      await launchUrl(whatsappUri);
+    }
+  }
+  void _showHelpModal() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFFFFF3E0), Color(0xFFFFE0B2)],
+            ),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [Color(0xFFFFB300), Color(0xFF8D6E63)],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0x338D6E63),
+                      blurRadius: 16,
+                      offset: Offset(0, 8),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(20),
+                child: const Icon(
+                  Icons.headset_mic,
+                  color: Colors.white,
+                  size: 44,
+                ),
+              ),
+              const SizedBox(height: 18),
+              const Text(
+                "We're Here for You",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF6D4C41)),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                "Our support team is here to assist you at any time.",
+                style: TextStyle(fontSize: 16, color: Color(0xFF8D6E63)),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 28),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _launchEmail();
+                    },
+                    icon: const Icon(Icons.email_outlined),
+                    label: const Text('Contact via Email'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6D4C41),
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size.fromHeight(48),
+                      textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _launchWhatsApp();
+                    },
+                    icon: const Icon(Icons.chat_bubble, color: Colors.white),
+                    label: const Text('Contact via WhatsApp'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF25D366),
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size.fromHeight(48),
+                      textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              TextButton(
+                onPressed: () {
+                  // TODO: Implement feedback action
+                  Navigator.pop(context);
+                },
+                child: const Text(
+                  'Send Feedback',
+                  style: TextStyle(color: Color(0xFF8D6E63)),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   List<Map<String, dynamic>> bills = [];
   bool isLoading = true;
 
@@ -76,6 +212,31 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [_buildBillsPage(), _buildAnnouncementsPage()],
               ),
       ),
+      floatingActionButton: Container(
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            colors: [Color(0xFFFFB300), Color(0xFF8D6E63)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Color(0x338D6E63),
+              blurRadius: 16,
+              offset: Offset(0, 8),
+            ),
+          ],
+        ),
+        child: FloatingActionButton(
+          onPressed: _showHelpModal,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          shape: const CircleBorder(),
+          child: const Icon(Icons.headset_mic, color: Colors.white, size: 32),
+          tooltip: 'Help',
+        ),
+      ),
     );
   }
 
@@ -123,12 +284,25 @@ class _HomeScreenState extends State<HomeScreen> {
       orElse: () => {'amount': 0, 'status': 'N/A'},
     );
 
-    return _buildBillCard(
-      "${_translateType(type)} ",
-      "\$${bill['amount']}",
-      bill['status'],
-      getIcon(type),
-      getColor(type),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BillDetailsScreen(
+              type: type.toLowerCase(),
+              docId: widget.docId,
+            ),
+          ),
+        );
+      },
+      child: _buildBillCard(
+        "${_translateType(type)}",
+        "\$${bill['amount']}",
+        bill['status'],
+        getIcon(type),
+        getColor(type),
+      ),
     );
   }
 
