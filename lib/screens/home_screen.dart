@@ -1,6 +1,8 @@
-import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../screens/home_screen.dart'; // تأكد من المسار الصحيح
+import '../screens/login_screen.dart'; // <-- Add this import for navigation
 import 'bill_details_screen.dart'; // تأكد من وجود هذه الصفحة
 
 class HomeScreen extends StatefulWidget {
@@ -38,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
       await launchUrl(whatsappUri);
     }
   }
+
   void _showHelpModal() {
     showModalBottomSheet(
       context: context,
@@ -84,7 +87,11 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 18),
               const Text(
                 "We're Here for You",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF6D4C41)),
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF6D4C41),
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
@@ -108,7 +115,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       backgroundColor: const Color(0xFF6D4C41),
                       foregroundColor: Colors.white,
                       minimumSize: const Size.fromHeight(48),
-                      textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -127,7 +137,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       backgroundColor: Color(0xFF25D366),
                       foregroundColor: Colors.white,
                       minimumSize: const Size.fromHeight(48),
-                      textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -205,36 +218,107 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFAEBD7),
-      body: SafeArea(
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : PageView(
-                children: [_buildBillsPage(), _buildAnnouncementsPage()],
-              ),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFFAEBD7),
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        title: null,
+        actions: [],
       ),
-      floatingActionButton: Container(
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: LinearGradient(
-            colors: [Color(0xFFFFB300), Color(0xFF8D6E63)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Color(0x338D6E63),
-              blurRadius: 16,
-              offset: Offset(0, 8),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : PageView(
+                    children: [_buildBillsPage(), _buildAnnouncementsPage()],
+                  ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  bottom: 24.0,
+                  left: 16.0,
+                  right: 16.0,
+                ),
+                child: Container(
+                  width: double.infinity,
+                  height: 92,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(32),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.brown.withOpacity(0.10),
+                        blurRadius: 32,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: _showHelpModal,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(
+                                Icons.headset_mic,
+                                color: Color(0xFF8D6E63),
+                                size: 38,
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Support',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 18,
+                                  color: Color(0xFF8D6E63),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LoginScreen(),
+                              ),
+                              (route) => false,
+                            );
+                          },
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(
+                                Icons.logout_outlined,
+                                color: Color(0xFF8D6E63),
+                                size: 38,
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Logout',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 18,
+                                  color: Color(0xFF8D6E63),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ],
-        ),
-        child: FloatingActionButton(
-          onPressed: _showHelpModal,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          shape: const CircleBorder(),
-          child: const Icon(Icons.headset_mic, color: Colors.white, size: 32),
-          tooltip: 'Help',
         ),
       ),
     );

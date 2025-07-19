@@ -134,7 +134,11 @@ class _LoginScreenState extends State<LoginScreen>
               const SizedBox(height: 18),
               const Text(
                 "We're Here for You",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF6D4C41)),
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF6D4C41),
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
@@ -158,7 +162,10 @@ class _LoginScreenState extends State<LoginScreen>
                       backgroundColor: const Color(0xFF6D4C41),
                       foregroundColor: Colors.white,
                       minimumSize: const Size.fromHeight(48),
-                      textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -195,7 +202,11 @@ class _LoginScreenState extends State<LoginScreen>
       await launchUrl(emailUri);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No email app found. Please install or configure an email app.')),
+        const SnackBar(
+          content: Text(
+            'No email app found. Please install or configure an email app.',
+          ),
+        ),
       );
     }
   }
