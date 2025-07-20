@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 
 class BillDetailsScreen extends StatefulWidget {
   final String type;
@@ -33,7 +35,6 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
     'Dec',
   ];
   List<String> availableYears = [];
-  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
 
   @override
   void initState() {
@@ -64,16 +65,6 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
         availableYears = years;
         isLoading = false;
       });
-      // Animate cards in
-      if (_listKey.currentState != null) {
-        for (int i = 0; i < bills.length; i++) {
-          Future.delayed(Duration(milliseconds: 80 * i), () {
-            if (_listKey.currentState != null) {
-              _listKey.currentState!.insertItem(i);
-            }
-          });
-        }
-      }
     } catch (e) {
       print('Error fetching bills: $e');
       setState(() {
@@ -96,13 +87,15 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
     }
 
     if (selectedMonth != null) {
-      filtered = filtered
-          .where(
-            (bill) =>
-                int.tryParse(bill['month'] ?? '') != null &&
-                monthNames[int.parse(bill['month']) - 1] == selectedMonth,
-          )
-          .toList();
+      filtered = filtered.where((bill) {
+        final monthStr = bill['month']?.toString() ?? '';
+        final monthNum = int.tryParse(monthStr);
+        // تحقق أن monthNum ليس null وأنه بين 1 و12
+        if (monthNum != null && monthNum >= 1 && monthNum <= 12) {
+          return monthNames[monthNum - 1] == selectedMonth;
+        }
+        return false;
+      }).toList();
     }
 
     if (selectedYear != null) {
@@ -118,6 +111,10 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF232323) : const Color(0xFFFAEBD7);
+    final cardColor = isDark ? const Color(0xFF2D2D2D) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF6D4C41);
     final title = _translateType(widget.type);
     final theme = ThemeData.light().copyWith(
       scaffoldBackgroundColor: const Color(0xFFFDF6EC),
@@ -131,7 +128,19 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
     return Theme(
       data: theme,
       child: Scaffold(
-        appBar: AppBar(title: Text('$title Bills')),
+        backgroundColor: bgColor,
+        appBar: AppBar(
+          title: Text(
+            '$title Bills',
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          backgroundColor: isDark ? const Color(0xFF2D2D2D) : Colors.brown,
+          iconTheme: IconThemeData(color: Colors.white),
+          elevation: 0,
+        ),
         body: isLoading
             ? const Center(child: CircularProgressIndicator())
             : Column(
@@ -142,38 +151,78 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                     child: Row(
                       children: [
                         Expanded(
-                          child: DropdownButton<String>(
-                            value: selectedStatus,
-                            isExpanded: true,
-                            items: ['All', 'Paid', 'Unpaid']
-                                .map(
-                                  (status) => DropdownMenuItem(
-                                    value: status,
-                                    child: Text(status),
-                                  ),
-                                )
-                                .toList(),
-                            onChanged: (value) {
-                              if (value != null) {
-                                setState(() {
-                                  selectedStatus = value;
-                                  applyFilters();
-                                });
-                              }
-                            },
+                          child: Theme(
+                            data: Theme.of(
+                              context,
+                            ).copyWith(canvasColor: cardColor),
+                            child: DropdownButton<String>(
+                              value: selectedStatus,
+                              isExpanded: true,
+                              dropdownColor: cardColor,
+                              style: TextStyle(
+                                color: isDark ? Colors.white : Colors.brown,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              iconEnabledColor: isDark
+                                  ? Colors.white
+                                  : Colors.brown,
+                              items: ['All', 'Paid', 'Unpaid']
+                                  .map(
+                                    (status) => DropdownMenuItem(
+                                      value: status,
+                                      child: Text(status),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  setState(() {
+                                    selectedStatus = value;
+                                    applyFilters();
+                                  });
+                                }
+                              },
+                            ),
                           ),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: DropdownButton<String>(
-                            hint: const Text("Month"),
+                            hint: Text(
+                              "Month",
+                              style: TextStyle(
+                                color: isDark
+                                    ? Colors.white
+                                    : Colors.brown, // لون النص في الـhint
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             value: selectedMonth,
                             isExpanded: true,
+                            dropdownColor: cardColor,
+                            style: TextStyle(
+                              color: isDark
+                                  ? Colors.white
+                                  : Colors.brown, // لون النص داخل القائمة
+                              fontWeight: FontWeight.bold,
+                            ),
+                            iconEnabledColor: isDark
+                                ? Colors.white
+                                : Colors.brown,
                             items: monthNames
                                 .map(
                                   (month) => DropdownMenuItem(
                                     value: month,
-                                    child: Text(month),
+                                    child: Text(
+                                      month,
+                                      style: TextStyle(
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors
+                                                  .brown, // لون النص داخل العنصر
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
                                 )
                                 .toList(),
@@ -188,14 +237,41 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: DropdownButton<String>(
-                            hint: const Text("Year"),
+                            hint: Text(
+                              "Year",
+                              style: TextStyle(
+                                color: isDark
+                                    ? Colors.white
+                                    : Colors.brown, // لون النص في الـhint
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             value: selectedYear,
                             isExpanded: true,
+                            dropdownColor: cardColor,
+                            style: TextStyle(
+                              color: isDark
+                                  ? Colors.white
+                                  : Colors.brown, // لون النص داخل القائمة
+                              fontWeight: FontWeight.bold,
+                            ),
+                            iconEnabledColor: isDark
+                                ? Colors.white
+                                : Colors.brown,
                             items: availableYears
                                 .map(
                                   (year) => DropdownMenuItem(
                                     value: year,
-                                    child: Text(year),
+                                    child: Text(
+                                      year,
+                                      style: TextStyle(
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors
+                                                  .brown, // لون النص داخل العنصر
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
                                 )
                                 .toList(),
@@ -223,19 +299,14 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                       },
                       child: filteredBills.isEmpty
                           ? const Center(child: Text("No bills found."))
-                          : AnimatedList(
-                              key: _listKey,
-                              initialItemCount: filteredBills.length,
+                          : ListView.builder(
                               padding: const EdgeInsets.all(16),
-                              itemBuilder: (context, index, animation) {
+                              itemCount: filteredBills.length,
+                              itemBuilder: (context, index) {
                                 final bill = filteredBills[index];
-                                return SizeTransition(
-                                  sizeFactor: animation,
-                                  axis: Axis.vertical,
-                                  child: GestureDetector(
-                                    onTap: () => _showBillDetailsModal(bill),
-                                    child: _buildBillCard(bill, Colors.teal),
-                                  ),
+                                return GestureDetector(
+                                  onTap: () => _showBillDetailsModal(bill),
+                                  child: _buildBillCard(bill, Colors.teal),
                                 );
                               },
                             ),
@@ -248,6 +319,8 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
   }
 
   Widget _buildBillCard(Map<String, dynamic> bill, Color color) {
+    final isDark =
+        Theme.of(context).brightness == Brightness.dark; // أضف هذا السطر
     final bool isPaid = bill['status']?.toString().toLowerCase() == 'paid';
     final int? monthIndex = int.tryParse(bill['month'] ?? '') != null
         ? int.parse(bill['month']) - 1
@@ -304,29 +377,46 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
               children: [
                 Icon(
                   Icons.attach_money,
-                  color: Colors.brown.shade300,
+                  color: isDark ? Colors.brown.shade100 : Colors.brown.shade300,
                   size: 20,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   "${bill['amount']}",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
+                    color: isDark ? Colors.white : Colors.black,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Chip(
-                  label: Text(monthName),
-                  backgroundColor: Colors.brown.shade50,
-                  labelStyle: const TextStyle(fontWeight: FontWeight.w500),
+                  label: Text(
+                    monthName,
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.brown,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  backgroundColor: isDark
+                      ? Colors.brown.shade800
+                      : Colors.brown.shade50,
                 ),
                 if (year.isNotEmpty) ...[
                   const SizedBox(width: 6),
                   Chip(
-                    label: Text(year),
-                    backgroundColor: Colors.brown.shade50,
-                    labelStyle: const TextStyle(fontWeight: FontWeight.w500),
+                    label: Text(
+                      year,
+                      style: TextStyle(
+                        color: isDark
+                            ? Colors.white
+                            : Colors.brown, // لون النص حسب الثيم
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    backgroundColor: isDark
+                        ? Colors.brown.shade800
+                        : Colors.brown.shade50,
                   ),
                 ],
               ],
@@ -336,13 +426,16 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
               children: [
                 Icon(
                   Icons.info_outline,
-                  color: Colors.brown.shade300,
+                  color: isDark ? Colors.brown.shade100 : Colors.brown.shade300,
                   size: 18,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   "Status: ${bill['status']}",
-                  style: const TextStyle(fontSize: 15),
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: isDark ? Colors.white70 : Colors.black87,
+                  ),
                 ),
               ],
             ),
@@ -363,6 +456,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
 
   void _showBillDetailsModal(Map<String, dynamic> bill) {
     final bool isPaid = bill['status']?.toString().toLowerCase() == 'paid';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final int? monthIndex = int.tryParse(bill['month'] ?? '') != null
         ? int.parse(bill['month']) - 1
         : null;
@@ -374,160 +468,344 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
         : bill['month']?.toString() ?? '';
     final String year = bill['year']?.toString() ?? '';
 
+    // استخراج تاريخ الفاتورة
+    DateTime? createdAt;
+    if (bill['createdAt'] != null) {
+      try {
+        createdAt = DateTime.parse(bill['createdAt'].toString());
+      } catch (_) {}
+    }
+    // حساب تاريخ الاستحقاق (بعد أسبوع)
+    DateTime? dueDate;
+    if (bill['dueDate'] != null) {
+      if (bill['dueDate'] is Timestamp) {
+        dueDate = (bill['dueDate'] as Timestamp).toDate();
+      } else if (bill['dueDate'] is String) {
+        try {
+          dueDate = DateTime.parse(bill['dueDate']);
+        } catch (_) {}
+      }
+    }
+
+    // أضف 7 أيام على dueDate إذا كانت موجودة
+    if (dueDate != null) {
+      dueDate = dueDate.add(const Duration(days: 7));
+    }
+
+    // إذا لم يوجد dueDate استخدم createdAt + 7 أيام
+    if (dueDate == null && bill['createdAt'] != null) {
+      if (bill['createdAt'] is Timestamp) {
+        dueDate = (bill['createdAt'] as Timestamp).toDate().add(
+          const Duration(days: 7),
+        );
+      } else if (bill['createdAt'] is String) {
+        try {
+          final createdAt = DateTime.parse(bill['createdAt']);
+          dueDate = createdAt.add(const Duration(days: 7));
+        } catch (_) {}
+      }
+    }
+
+    // تنسيق التاريخ
+    String formattedDueDate = '-';
+    if (dueDate != null && dueDate.month >= 1 && dueDate.month <= 12) {
+      final months = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
+      ];
+      formattedDueDate =
+          '${dueDate.day} ${months[dueDate.month - 1]} ${dueDate.year}';
+    } else {
+      formattedDueDate = '-';
+    }
+
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      backgroundColor: Theme.of(context).cardColor,
+      isScrollControlled: true,
+      backgroundColor: isDark
+          ? const Color(0xFF232323)
+          : const Color(0xFFFDF6EC),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
       builder: (context) {
         return Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: MediaQuery.of(
+            context,
+          ).viewInsets.add(const EdgeInsets.all(24)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // رأس البطاقة
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CircleAvatar(
+                    radius: 28,
                     backgroundColor: isPaid
-                        ? Colors.green.shade100
-                        : Colors.red.shade100,
+                        ? (isDark
+                              ? Colors.green.shade900
+                              : Colors.green.shade100)
+                        : (isDark ? Colors.red.shade900 : Colors.red.shade100),
                     child: Icon(
                       isPaid ? Icons.check_circle : Icons.error_outline,
                       color: isPaid ? Colors.green : Colors.red,
+                      size: 32,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Text(
-                    isPaid ? 'Paid' : 'Unpaid',
-                    style: TextStyle(
-                      color: isPaid ? Colors.green : Colors.red,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
+                  const SizedBox(width: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isPaid ? 'Paid' : 'Unpaid',
+                        style: TextStyle(
+                          color: isPaid
+                              ? (isDark ? Colors.green.shade200 : Colors.green)
+                              : (isDark ? Colors.red.shade200 : Colors.red),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                    ],
                   ),
                   const Spacer(),
-                  Chip(
-                    label: Text(monthName),
-                    backgroundColor: Colors.brown.shade50,
-                  ),
-                  if (year.isNotEmpty) ...[
-                    const SizedBox(width: 6),
-                    Chip(
-                      label: Text(year),
-                      backgroundColor: Colors.brown.shade50,
+                  // Month & Year Chips
+                  if (monthName.isNotEmpty)
+                    Container(
+                      margin: const EdgeInsets.only(right: 8),
+                      child: Chip(
+                        label: Text(
+                          monthName,
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.brown,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        backgroundColor: isDark
+                            ? Colors.brown.shade800
+                            : const Color(0xFFEDE0C8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 0,
+                        ),
+                      ),
                     ),
-                  ],
+                  if (year.isNotEmpty)
+                    Chip(
+                      label: Text(
+                        year,
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.brown,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      backgroundColor: isDark
+                          ? Colors.brown.shade800
+                          : const Color(0xFFEDE0C8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 0,
+                      ),
+                    ),
                 ],
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 24),
+              // Amount
               Row(
                 children: [
-                  Icon(Icons.attach_money, color: Colors.brown.shade300),
+                  Icon(
+                    Icons.attach_money,
+                    color: isDark
+                        ? Colors.brown.shade100
+                        : Colors.brown.shade300,
+                    size: 26,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     'Amount: ',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      fontSize: 16,
+                      fontSize: 18,
+                      color: isDark ? Colors.white70 : Colors.black,
                     ),
                   ),
                   Text(
                     '${bill['amount']}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                      fontSize: 20,
+                      color: isDark ? Colors.white : Colors.black,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
+              // Status
               Row(
                 children: [
-                  Icon(Icons.info_outline, color: Colors.brown.shade300),
+                  Icon(
+                    Icons.info_outline,
+                    color: isDark
+                        ? Colors.brown.shade100
+                        : Colors.brown.shade300,
+                    size: 24,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     'Status: ',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      fontSize: 16,
+                      fontSize: 18,
+                      color: isDark ? Colors.white70 : Colors.black,
                     ),
                   ),
                   Text(
                     '${bill['status']}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              // Due Date
+              Row(
+                children: [
+                  Icon(
+                    Icons.calendar_today,
+                    color: isDark
+                        ? Colors.brown.shade100
+                        : Colors.brown.shade300,
+                    size: 22,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Due Date: ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
                       fontSize: 18,
+                      color: isDark ? Colors.white70 : Colors.black,
+                    ),
+                  ),
+                  Text(
+                    formattedDueDate,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
+              // أزرار
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        // ضع هنا منطق طلب الفاتورة
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: Colors.green, width: 2),
+                        backgroundColor: isDark
+                            ? const Color(0xFF232323)
+                            : const Color(0xFFFDF6EC),
+                        foregroundColor: Colors.green,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        'Request Bill',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.brown,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        'Close',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 12),
-              if (bill['note'] != null &&
-                  bill['note'].toString().isNotEmpty) ...[
-                Row(
-                  children: [
-                    Icon(
-                      Icons.sticky_note_2_outlined,
-                      color: Colors.brown.shade300,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Note: ${bill['note']}',
-                        style: const TextStyle(fontSize: 16),
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-              ],
-              Row(
-                children: [
-                  Icon(
-                    Icons.calendar_today,
-                    color: Colors.brown.shade300,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Created: ',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                    ),
-                  ),
-                  Text(
-                    bill['createdAt'] != null
-                        ? bill['createdAt'].toString()
-                        : '-',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              Align(
-                alignment: Alignment.centerRight,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.brown,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text('Close'),
-                ),
-              ),
             ],
           ),
         );
       },
     );
+  }
+
+  Future<void> sendBillRequestEmail({
+    required String adminEmail,
+    required String userName,
+    required String userLastName,
+    required String userPhone,
+    required Map<String, dynamic> bill,
+  }) async {
+    // إعداد SMTP (يفضل بريد خاص بالتطبيق)
+    final smtpServer = gmail(
+      'abdodj9425@gmail.com',
+      'Qazwsxedc1',
+    ); // غيّرها لاحقاً
+
+    final message = Message()
+      ..from = Address('abdodj9425@gmail.com', 'Bills App')
+      ..recipients.add(adminEmail)
+      ..subject = 'طلب فاتورة من المستخدم $userName $userLastName'
+      ..text =
+          '''
+تم طلب فاتورة جديدة من المستخدم:
+الاسم: $userName $userLastName
+رقم الهاتف: $userPhone
+
+معلومات الفاتورة:
+${bill.entries.map((e) => '${e.key}: ${e.value}').join('\n')}
+''';
+
+    try {
+      await send(message, smtpServer);
+    } catch (e) {
+      print('فشل إرسال الإيميل: $e');
+      rethrow;
+    }
   }
 
   String _translateType(String type) {
@@ -542,6 +820,19 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
         return 'Additional Fees';
       default:
         return 'Other';
+    }
+  }
+
+  Future<Map<String, dynamic>?> fetchUserInfo() async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(widget.docId)
+          .get();
+      return doc.data();
+    } catch (e) {
+      print('فشل جلب بيانات المستخدم: $e');
+      return null;
     }
   }
 }

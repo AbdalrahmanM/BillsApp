@@ -1,9 +1,10 @@
+import 'package:bills_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../screens/home_screen.dart'; // تأكد من المسار الصحيح
 import '../screens/login_screen.dart'; // <-- Add this import for navigation
 import 'bill_details_screen.dart'; // تأكد من وجود هذه الصفحة
+import 'theme_controller.dart'; // import your controller
 
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -42,21 +43,28 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showHelpModal() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? const Color(0xFF232323) : Colors.white,
       builder: (context) {
         return Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFFFFF3E0), Color(0xFFFFE0B2)],
-            ),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          decoration: BoxDecoration(
+            gradient: isDark
+                ? const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF232323), Color(0xFF2D2D2D)],
+                  )
+                : const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFFFFF3E0), Color(0xFFFFE0B2)],
+                  ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32),
           child: Column(
@@ -64,16 +72,22 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: [Color(0xFFFFB300), Color(0xFF8D6E63)],
-                  ),
+                  gradient: isDark
+                      ? const LinearGradient(
+                          colors: [Color(0xFF8D6E63), Color(0xFF4E342E)],
+                        )
+                      : const LinearGradient(
+                          colors: [Color(0xFFFFB300), Color(0xFF8D6E63)],
+                        ),
                   boxShadow: [
                     BoxShadow(
-                      color: Color(0x338D6E63),
+                      color: isDark
+                          ? Colors.black.withOpacity(0.3)
+                          : const Color(0x338D6E63),
                       blurRadius: 16,
-                      offset: Offset(0, 8),
+                      offset: const Offset(0, 8),
                     ),
                   ],
                 ),
@@ -85,19 +99,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 18),
-              const Text(
+              Text(
                 "We're Here for You",
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF6D4C41),
+                  color: isDark ? Colors.white : const Color(0xFF6D4C41),
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 "Our support team is here to assist you at any time.",
-                style: TextStyle(fontSize: 16, color: Color(0xFF8D6E63)),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isDark
+                      ? Colors.brown.shade100
+                      : const Color(0xFF8D6E63),
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 28),
@@ -112,7 +131,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: const Icon(Icons.email_outlined),
                     label: const Text('Contact via Email'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF6D4C41),
+                      backgroundColor: isDark
+                          ? Colors.brown.shade700
+                          : const Color(0xFF6D4C41),
                       foregroundColor: Colors.white,
                       minimumSize: const Size.fromHeight(48),
                       textStyle: const TextStyle(
@@ -134,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: const Icon(Icons.chat_bubble, color: Colors.white),
                     label: const Text('Contact via WhatsApp'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF25D366),
+                      backgroundColor: const Color(0xFF25D366),
                       foregroundColor: Colors.white,
                       minimumSize: const Size.fromHeight(48),
                       textStyle: const TextStyle(
@@ -152,12 +173,15 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 18),
               TextButton(
                 onPressed: () {
-                  // TODO: Implement feedback action
                   Navigator.pop(context);
                 },
-                child: const Text(
+                child: Text(
                   'Send Feedback',
-                  style: TextStyle(color: Color(0xFF8D6E63)),
+                  style: TextStyle(
+                    color: isDark
+                        ? Colors.brown.shade100
+                        : const Color(0xFF8D6E63),
+                  ),
                 ),
               ),
             ],
@@ -216,14 +240,40 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF232323) : const Color(0xFFFAEBD7);
+    final cardColor = isDark ? const Color(0xFF2D2D2D) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF6D4C41);
+    final iconColor = isDark ? Colors.white : const Color(0xFF8D6E63);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFAEBD7),
+      backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFAEBD7),
+        backgroundColor: bgColor,
         elevation: 0,
         automaticallyImplyLeading: false,
         title: null,
-        actions: [],
+        actions: [
+          IconButton(
+            icon: Icon(
+              Theme.of(context).brightness == Brightness.dark
+                  ? Icons
+                        .light_mode // ☀️ أيقونة جديدة للوضع الفاتح
+                  : Icons.dark_mode, // 🌙 أيقونة جديدة للوضع الداكن
+              color: iconColor,
+            ),
+            onPressed: () {
+              final isDark = Theme.of(context).brightness == Brightness.dark;
+              themeController.setTheme(
+                isDark ? ThemeMode.light : ThemeMode.dark,
+              );
+              setState(() {});
+            },
+            tooltip: Theme.of(context).brightness == Brightness.dark
+                ? 'Switch to Light Mode'
+                : 'Switch to Dark Mode',
+          ),
+        ],
       ),
       body: SafeArea(
         child: Stack(
@@ -231,7 +281,10 @@ class _HomeScreenState extends State<HomeScreen> {
             isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : PageView(
-                    children: [_buildBillsPage(), _buildAnnouncementsPage()],
+                    children: [
+                      _buildBillsPage(isDark),
+                      _buildAnnouncementsPage(isDark),
+                    ],
                   ),
             Align(
               alignment: Alignment.bottomCenter,
@@ -245,7 +298,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: double.infinity,
                   height: 92,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: cardColor,
                     borderRadius: BorderRadius.circular(32),
                     boxShadow: [
                       BoxShadow(
@@ -262,19 +315,19 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: _showHelpModal,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
+                            children: [
                               Icon(
                                 Icons.headset_mic,
-                                color: Color(0xFF8D6E63),
+                                color: iconColor,
                                 size: 38,
                               ),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               Text(
                                 'Support',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w900,
                                   fontSize: 18,
-                                  color: Color(0xFF8D6E63),
+                                  color: textColor,
                                 ),
                               ),
                             ],
@@ -294,19 +347,19 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
+                            children: [
                               Icon(
                                 Icons.logout_outlined,
-                                color: Color(0xFF8D6E63),
+                                color: iconColor,
                                 size: 38,
                               ),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               Text(
                                 'Logout',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w900,
                                   fontSize: 18,
-                                  color: Color(0xFF8D6E63),
+                                  color: textColor,
                                 ),
                               ),
                             ],
@@ -324,7 +377,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildBillsPage() {
+  Widget _buildBillsPage(bool isDark) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -350,10 +403,10 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
               children: [
-                _buildFromData('water'),
-                _buildFromData('gas'),
-                _buildFromData('electricity'),
-                _buildFromData('fees'),
+                _buildFromData('water', isDark),
+                _buildFromData('gas', isDark),
+                _buildFromData('electricity', isDark),
+                _buildFromData('fees', isDark),
               ],
             ),
           ),
@@ -362,7 +415,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildFromData(String type) {
+  Widget _buildFromData(String type, bool isDark) {
     final bill = bills.firstWhere(
       (b) => b['type'].toString().toLowerCase() == type,
       orElse: () => {'amount': 0, 'status': 'N/A'},
@@ -385,7 +438,8 @@ class _HomeScreenState extends State<HomeScreen> {
         "\$${bill['amount']}",
         bill['status'],
         getIcon(type),
-        getColor(type),
+        getColor(type, isDark),
+        isDark,
       ),
     );
   }
@@ -396,6 +450,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String status,
     IconData icon,
     Color bgColor,
+    bool isDark,
   ) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -406,7 +461,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 30, color: Colors.brown),
+          Icon(icon, size: 30, color: isDark ? Colors.white : Colors.brown),
           const SizedBox(height: 10),
           Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
           Text(amount, style: const TextStyle(fontSize: 20)),
@@ -416,14 +471,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildAnnouncementsPage() {
+  Widget _buildAnnouncementsPage(bool isDark) {
     return Center(
       child: Text(
         "Announcements",
         style: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.bold,
-          color: Colors.blue.shade700,
+          color: isDark ? Colors.white : Colors.blue.shade700,
         ),
       ),
     );
@@ -442,16 +497,16 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Color getColor(String type) {
+  Color getColor(String type, bool isDark) {
     switch (type.toLowerCase()) {
       case 'water':
-        return Colors.lightBlue.shade100;
+        return isDark ? Colors.lightBlue.shade700 : Colors.lightBlue.shade100;
       case 'gas':
-        return Colors.orange.shade100;
+        return isDark ? Colors.orange.shade700 : Colors.orange.shade100;
       case 'electricity':
-        return Colors.blue.shade100;
+        return isDark ? Colors.blue.shade700 : Colors.blue.shade100;
       default:
-        return Colors.amber.shade100;
+        return isDark ? Colors.amber.shade700 : Colors.amber.shade100;
     }
   }
 
