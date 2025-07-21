@@ -1,3 +1,4 @@
+import 'package:bills_app/l10n/app_localizations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mailer/mailer.dart';
@@ -35,6 +36,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
     'Dec',
   ];
   List<String> availableYears = [];
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
 
   @override
   void initState() {
@@ -65,6 +67,16 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
         availableYears = years;
         isLoading = false;
       });
+      // Animate cards in
+      if (_listKey.currentState != null) {
+        for (int i = 0; i < bills.length; i++) {
+          Future.delayed(Duration(milliseconds: 80 * i), () {
+            if (_listKey.currentState != null) {
+              _listKey.currentState!.insertItem(i);
+            }
+          });
+        }
+      }
     } catch (e) {
       print('Error fetching bills: $e');
       setState(() {
@@ -115,7 +127,8 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
     final bgColor = isDark ? const Color(0xFF232323) : const Color(0xFFFAEBD7);
     final cardColor = isDark ? const Color(0xFF2D2D2D) : Colors.white;
     final textColor = isDark ? Colors.white : const Color(0xFF6D4C41);
-    final title = _translateType(widget.type);
+    final loc = AppLocalizations.of(context)!;
+    final title = "${loc.bills} ${_localizedType(context, widget.type)}";
     final theme = ThemeData.light().copyWith(
       scaffoldBackgroundColor: const Color(0xFFFDF6EC),
       cardColor: Colors.white,
@@ -131,7 +144,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
         backgroundColor: bgColor,
         appBar: AppBar(
           title: Text(
-            '$title Bills',
+            title,
             style: TextStyle(
               color: isDark ? Colors.white : Colors.white,
               fontWeight: FontWeight.bold,
@@ -319,9 +332,10 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
   }
 
   Widget _buildBillCard(Map<String, dynamic> bill, Color color) {
-    final isDark =
-        Theme.of(context).brightness == Brightness.dark; // أضف هذا السطر
+    final loc = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final bool isPaid = bill['status']?.toString().toLowerCase() == 'paid';
+    final String localizedStatus = isPaid ? loc.paid : loc.unpaid;
     final int? monthIndex = int.tryParse(bill['month'] ?? '') != null
         ? int.parse(bill['month']) - 1
         : null;
@@ -362,7 +376,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
         title: Padding(
           padding: const EdgeInsets.only(bottom: 4.0),
           child: Text(
-            "${isPaid ? 'Paid' : 'Unpaid'}",
+            localizedStatus,
             style: TextStyle(
               color: isPaid ? Colors.green : Colors.red,
               fontWeight: FontWeight.bold,
@@ -389,6 +403,15 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                     color: isDark ? Colors.white : Colors.black,
                   ),
                 ),
+                const SizedBox(width: 4),
+                Text(
+                  ":${loc.amount}",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: isDark ? Colors.white70 : Colors.brown,
+                  ),
+                ),
                 const SizedBox(width: 12),
                 Chip(
                   label: Text(
@@ -408,9 +431,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                     label: Text(
                       year,
                       style: TextStyle(
-                        color: isDark
-                            ? Colors.white
-                            : Colors.brown, // لون النص حسب الثيم
+                        color: isDark ? Colors.white : Colors.brown,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -431,10 +452,20 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  "Status: ${bill['status']}",
+                  // Use localized status here!
+                  isPaid ? loc.paid : loc.unpaid,
                   style: TextStyle(
-                    fontSize: 15,
-                    color: isDark ? Colors.white70 : Colors.black87,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
+                ),
+                Text(
+                  " :${loc.status}",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    color: isDark ? Colors.white70 : Colors.brown,
                   ),
                 ),
               ],
@@ -455,7 +486,9 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
   }
 
   void _showBillDetailsModal(Map<String, dynamic> bill) {
+    final loc = AppLocalizations.of(context)!;
     final bool isPaid = bill['status']?.toString().toLowerCase() == 'paid';
+    final String localizedStatus = isPaid ? loc.paid : loc.unpaid;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final int? monthIndex = int.tryParse(bill['month'] ?? '') != null
         ? int.parse(bill['month']) - 1
@@ -567,7 +600,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isPaid ? 'Paid' : 'Unpaid',
+                        localizedStatus, // <-- use localized status here
                         style: TextStyle(
                           color: isPaid
                               ? (isDark ? Colors.green.shade200 : Colors.green)
@@ -633,19 +666,19 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Amount: ',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 18,
-                      color: isDark ? Colors.white70 : Colors.black,
-                    ),
-                  ),
-                  Text(
                     '${bill['amount']}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
                       color: isDark ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  Text(
+                    " :${loc.amount}",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                      color: isDark ? Colors.white70 : Colors.brown,
                     ),
                   ),
                 ],
@@ -663,19 +696,20 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Status: ',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 18,
-                      color: isDark ? Colors.white70 : Colors.black,
-                    ),
-                  ),
-                  Text(
-                    '${bill['status']}',
+                    // Use localized status here!
+                    isPaid ? loc.paid : loc.unpaid,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
                       color: isDark ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  Text(
+                    " :${loc.status}",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                      color: isDark ? Colors.white70 : Colors.brown,
                     ),
                   ),
                 ],
@@ -693,19 +727,19 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Due Date: ',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 18,
-                      color: isDark ? Colors.white70 : Colors.black,
-                    ),
-                  ),
-                  Text(
                     formattedDueDate,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
                       color: isDark ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  Text(
+                    " :${loc.dueDate}",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                      color: isDark ? Colors.white70 : Colors.brown,
                     ),
                   ),
                 ],
@@ -731,9 +765,9 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                         ),
                         elevation: 0,
                       ),
-                      child: const Text(
-                        'Request Bill',
-                        style: TextStyle(
+                      child: Text(
+                        loc.requestBill,
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                           color: Colors.green,
@@ -754,9 +788,9 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                         ),
                         elevation: 0,
                       ),
-                      child: const Text(
-                        'Close',
-                        style: TextStyle(
+                      child: Text(
+                        loc.close,
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                         ),
@@ -808,18 +842,19 @@ ${bill.entries.map((e) => '${e.key}: ${e.value}').join('\n')}
     }
   }
 
-  String _translateType(String type) {
+  String _localizedType(BuildContext context, String type) {
+    final loc = AppLocalizations.of(context)!;
     switch (type.toLowerCase()) {
       case 'water':
-        return 'Water';
+        return loc.water;
       case 'gas':
-        return 'Gas';
+        return loc.gas;
       case 'electricity':
-        return 'Electricity';
+        return loc.electricity;
       case 'fees':
-        return 'Additional Fees';
+        return loc.additionalFees;
       default:
-        return 'Other';
+        return loc.other;
     }
   }
 

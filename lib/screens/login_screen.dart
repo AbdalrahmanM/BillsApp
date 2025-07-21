@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../screens/home_screen.dart'; // تأكد من المسار الصحيح
+import 'package:bills_app/l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final ValueNotifier<Locale> localeNotifier;
+  const LoginScreen({super.key, required this.localeNotifier});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -223,13 +225,13 @@ class _LoginScreenState extends State<LoginScreen>
               const SizedBox(height: 80),
               Image.asset('lib/assets/friends.png', height: 180),
               const SizedBox(height: 30),
-              const Text(
-                "Hello",
+              Text(
+                AppLocalizations.of(context)!.hello,
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 8),
-              const Text(
-                "Welcome back!",
+              SizedBox(height: 8),
+              Text(
+                AppLocalizations.of(context)!.welcomeBack,
                 style: TextStyle(fontSize: 18, color: Colors.grey),
               ),
               const Spacer(),
@@ -252,7 +254,7 @@ class _LoginScreenState extends State<LoginScreen>
                         letterSpacing: 1,
                       ),
                     ),
-                    child: const Text("LOGIN"),
+                    child: Text(AppLocalizations.of(context)!.login),
                   ),
                 ),
               ),
@@ -261,8 +263,8 @@ class _LoginScreenState extends State<LoginScreen>
               Center(
                 child: TextButton(
                   onPressed: _showHelpModal,
-                  child: const Text(
-                    "Get help",
+                  child: Text(
+                    AppLocalizations.of(context)!.getHelp,
                     style: TextStyle(color: Colors.purple),
                   ),
                 ),
@@ -275,12 +277,23 @@ class _LoginScreenState extends State<LoginScreen>
           Positioned(
             bottom: 20,
             right: 20,
-            child: TextButton(
-              onPressed: () {},
-              child: const Text(
-                "EN / AR",
-                style: TextStyle(color: Colors.black54),
-              ),
+            child: ValueListenableBuilder<Locale>(
+              valueListenable: widget.localeNotifier,
+              builder: (context, locale, _) {
+                return TextButton(
+                  onPressed: () {
+                    if (locale.languageCode == 'en') {
+                      widget.localeNotifier.value = const Locale('ar');
+                    } else {
+                      widget.localeNotifier.value = const Locale('en');
+                    }
+                  },
+                  child: Text(
+                    locale.languageCode == 'en' ? "AR" : "EN",
+                    style: const TextStyle(color: Colors.black54),
+                  ),
+                );
+              },
             ),
           ),
 
@@ -313,8 +326,8 @@ class _LoginScreenState extends State<LoginScreen>
                           onPressed: toggleForm,
                         ),
                       ),
-                      const Text(
-                        "Phone number",
+                      Text(
+                        AppLocalizations.of(context)!.phoneNumber,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.brown,
@@ -323,15 +336,17 @@ class _LoginScreenState extends State<LoginScreen>
                       TextField(
                         controller: phoneController,
                         keyboardType: TextInputType.phone,
-                        decoration: const InputDecoration(
-                          hintText: "Enter Phone Number",
+                        decoration: InputDecoration(
+                          hintText: AppLocalizations.of(
+                            context,
+                          )!.enterPhoneNumber,
                           hintStyle: TextStyle(color: Colors.grey),
                           prefixIcon: Icon(Icons.phone, color: Colors.grey),
                         ),
                       ),
                       const SizedBox(height: 25),
-                      const Text(
-                        "Password",
+                      Text(
+                        AppLocalizations.of(context)!.password,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.brown,
@@ -340,8 +355,8 @@ class _LoginScreenState extends State<LoginScreen>
                       TextField(
                         controller: passwordController,
                         obscureText: true,
-                        decoration: const InputDecoration(
-                          hintText: "Enter Password",
+                        decoration: InputDecoration(
+                          hintText: AppLocalizations.of(context)!.enterPassword,
                           hintStyle: TextStyle(color: Colors.grey),
                           prefixIcon: Icon(Icons.lock, color: Colors.grey),
                         ),
@@ -357,7 +372,7 @@ class _LoginScreenState extends State<LoginScreen>
                               });
                             },
                           ),
-                          const Text("Remember me"),
+                          Text(AppLocalizations.of(context)!.rememberMe),
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -378,15 +393,15 @@ class _LoginScreenState extends State<LoginScreen>
                               letterSpacing: 1,
                             ),
                           ),
-                          child: const Text("SIGN IN"),
+                          child: Text(AppLocalizations.of(context)!.signIn),
                         ),
                       ),
                       const SizedBox(height: 20),
                       Center(
                         child: TextButton(
                           onPressed: _showHelpModal,
-                          child: const Text(
-                            "Get help",
+                          child: Text(
+                            AppLocalizations.of(context)!.getHelp,
                             style: TextStyle(color: Colors.purple),
                           ),
                         ),

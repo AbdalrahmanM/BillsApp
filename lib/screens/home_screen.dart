@@ -1,10 +1,12 @@
-import 'package:bills_app/main.dart';
+import 'package:bills_app/l10n/app_localizations.dart'; // أضف هذا السطر
+import 'package:bills_app/main.dart'; // Make sure this import is present
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../screens/login_screen.dart'; // <-- Add this import for navigation
 import 'bill_details_screen.dart'; // تأكد من وجود هذه الصفحة
 import 'theme_controller.dart'; // import your controller
+import 'announcements.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -100,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 18),
               Text(
-                "We're Here for You",
+                AppLocalizations.of(context)!.supportTitle, // Localized title
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -110,7 +112,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                "Our support team is here to assist you at any time.",
+                AppLocalizations.of(
+                  context,
+                )!.supportDesc, // Localized description
                 style: TextStyle(
                   fontSize: 16,
                   color: isDark
@@ -129,7 +133,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       _launchEmail();
                     },
                     icon: const Icon(Icons.email_outlined),
-                    label: const Text('Contact via Email'),
+                    label: Text(
+                      AppLocalizations.of(context)!.contactEmail,
+                    ), // Localized
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isDark
                           ? Colors.brown.shade700
@@ -153,7 +159,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       _launchWhatsApp();
                     },
                     icon: const Icon(Icons.chat_bubble, color: Colors.white),
-                    label: const Text('Contact via WhatsApp'),
+                    label: Text(
+                      AppLocalizations.of(context)!.contactWhatsApp,
+                    ), // Localized
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF25D366),
                       foregroundColor: Colors.white,
@@ -176,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.pop(context);
                 },
                 child: Text(
-                  'Send Feedback',
+                  'Send Feedback', // You can add this to ARB files if needed
                   style: TextStyle(
                     color: isDark
                         ? Colors.brown.shade100
@@ -283,7 +291,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 : PageView(
                     children: [
                       _buildBillsPage(isDark),
-                      _buildAnnouncementsPage(isDark),
+                      const AnnouncementsScreen(),
                     ],
                   ),
             Align(
@@ -323,7 +331,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Support',
+                                AppLocalizations.of(context)!.support,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w900,
                                   fontSize: 18,
@@ -340,7 +348,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const LoginScreen(),
+                                builder: (context) => LoginScreen(
+                                  localeNotifier: localeNotifier,
+                                ), // <-- Pass localeNotifier here
                               ),
                               (route) => false,
                             );
@@ -355,7 +365,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Logout',
+                                AppLocalizations.of(context)!.logout,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w900,
                                   fontSize: 18,
@@ -389,12 +399,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 10),
           Text(
-            "Hello, ${widget.userName} ${widget.lastName}",
+            "${AppLocalizations.of(context)!.hello}, ${widget.userName} ${widget.lastName}",
             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
-          const Text(
-            "Welcome back!",
-            style: TextStyle(fontSize: 16, color: Colors.grey),
+          Text(
+            AppLocalizations.of(context)!.welcomeBack,
+            style: const TextStyle(fontSize: 16, color: Colors.grey),
           ),
           const SizedBox(height: 20),
           Expanded(
@@ -513,15 +523,15 @@ class _HomeScreenState extends State<HomeScreen> {
   String _translateType(String type) {
     switch (type.toLowerCase()) {
       case 'water':
-        return 'Water';
+        return AppLocalizations.of(context)!.water;
       case 'gas':
-        return 'Gas';
+        return AppLocalizations.of(context)!.gas;
       case 'electricity':
-        return 'Electricity';
+        return AppLocalizations.of(context)!.electricity;
       case 'fees':
-        return 'Additional Fees';
+        return AppLocalizations.of(context)!.additionalFees;
       default:
-        return 'Other';
+        return AppLocalizations.of(context)!.other;
     }
   }
 }
