@@ -163,11 +163,9 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: [
+                        // فلتر الحالة
                         Expanded(
-                          child: Theme(
-                            data: Theme.of(
-                              context,
-                            ).copyWith(canvasColor: cardColor),
+                          child: DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
                               value: selectedStatus,
                               isExpanded: true,
@@ -199,101 +197,81 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                           ),
                         ),
                         const SizedBox(width: 10),
+                        // فلتر الشهر
                         Expanded(
-                          child: DropdownButton<String>(
-                            hint: Text(
-                              "Month",
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              hint: Text(
+                                "Month",
+                                style: TextStyle(
+                                  color: isDark ? Colors.white : Colors.brown,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              value: selectedMonth,
+                              isExpanded: true,
+                              dropdownColor: cardColor,
                               style: TextStyle(
-                                color: isDark
-                                    ? Colors.white
-                                    : Colors.brown, // لون النص في الـhint
+                                color: isDark ? Colors.white : Colors.brown,
                                 fontWeight: FontWeight.bold,
                               ),
-                            ),
-                            value: selectedMonth,
-                            isExpanded: true,
-                            dropdownColor: cardColor,
-                            style: TextStyle(
-                              color: isDark
+                              iconEnabledColor: isDark
                                   ? Colors.white
-                                  : Colors.brown, // لون النص داخل القائمة
-                              fontWeight: FontWeight.bold,
-                            ),
-                            iconEnabledColor: isDark
-                                ? Colors.white
-                                : Colors.brown,
-                            items: monthNames
-                                .map(
-                                  (month) => DropdownMenuItem(
-                                    value: month,
-                                    child: Text(
-                                      month,
-                                      style: TextStyle(
-                                        color: isDark
-                                            ? Colors.white
-                                            : Colors
-                                                  .brown, // لون النص داخل العنصر
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                  : Colors.brown,
+                              items: monthNames
+                                  .map(
+                                    (month) => DropdownMenuItem(
+                                      value: month,
+                                      child: Text(month),
                                     ),
-                                  ),
-                                )
-                                .toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                selectedMonth = value;
-                                applyFilters();
-                              });
-                            },
+                                  )
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedMonth = value;
+                                  applyFilters();
+                                });
+                              },
+                            ),
                           ),
                         ),
                         const SizedBox(width: 10),
+                        // فلتر السنة
                         Expanded(
-                          child: DropdownButton<String>(
-                            hint: Text(
-                              "Year",
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              hint: Text(
+                                "Year",
+                                style: TextStyle(
+                                  color: isDark ? Colors.white : Colors.brown,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              value: selectedYear,
+                              isExpanded: true,
+                              dropdownColor: cardColor,
                               style: TextStyle(
-                                color: isDark
-                                    ? Colors.white
-                                    : Colors.brown, // لون النص في الـhint
+                                color: isDark ? Colors.white : Colors.brown,
                                 fontWeight: FontWeight.bold,
                               ),
-                            ),
-                            value: selectedYear,
-                            isExpanded: true,
-                            dropdownColor: cardColor,
-                            style: TextStyle(
-                              color: isDark
+                              iconEnabledColor: isDark
                                   ? Colors.white
-                                  : Colors.brown, // لون النص داخل القائمة
-                              fontWeight: FontWeight.bold,
-                            ),
-                            iconEnabledColor: isDark
-                                ? Colors.white
-                                : Colors.brown,
-                            items: availableYears
-                                .map(
-                                  (year) => DropdownMenuItem(
-                                    value: year,
-                                    child: Text(
-                                      year,
-                                      style: TextStyle(
-                                        color: isDark
-                                            ? Colors.white
-                                            : Colors
-                                                  .brown, // لون النص داخل العنصر
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                  : Colors.brown,
+                              items: availableYears
+                                  .map(
+                                    (year) => DropdownMenuItem(
+                                      value: year,
+                                      child: Text(year),
                                     ),
-                                  ),
-                                )
-                                .toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                selectedYear = value;
-                                applyFilters();
-                              });
-                            },
+                                  )
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedYear = value;
+                                  applyFilters();
+                                });
+                              },
+                            ),
                           ),
                         ),
                       ],
@@ -394,7 +372,6 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                   color: isDark ? Colors.brown.shade100 : Colors.brown.shade300,
                   size: 20,
                 ),
-                const SizedBox(width: 4),
                 Text(
                   "${bill['amount']}",
                   style: TextStyle(
@@ -403,7 +380,6 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                     color: isDark ? Colors.white : Colors.black,
                   ),
                 ),
-                const SizedBox(width: 4),
                 Text(
                   ":${loc.amount}",
                   style: TextStyle(
@@ -412,21 +388,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                     color: isDark ? Colors.white70 : Colors.brown,
                   ),
                 ),
-                const SizedBox(width: 12),
-                Chip(
-                  label: Text(
-                    monthName,
-                    style: TextStyle(
-                      color: isDark ? Colors.white : Colors.brown,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  backgroundColor: isDark
-                      ? Colors.brown.shade800
-                      : Colors.brown.shade50,
-                ),
-                if (year.isNotEmpty) ...[
-                  const SizedBox(width: 6),
+                if (year.isNotEmpty)
                   Chip(
                     label: Text(
                       year,
@@ -439,7 +401,21 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                         ? Colors.brown.shade800
                         : Colors.brown.shade50,
                   ),
-                ],
+                if (year.isNotEmpty && monthName.isNotEmpty)
+                  const SizedBox(width: 8), // أضف هذا السطر للفصل بين الشيبس
+                if (monthName.isNotEmpty)
+                  Chip(
+                    label: Text(
+                      monthName,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.brown,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    backgroundColor: isDark
+                        ? Colors.brown.shade800
+                        : Colors.brown.shade50,
+                  ),
               ],
             ),
             const SizedBox(height: 6),

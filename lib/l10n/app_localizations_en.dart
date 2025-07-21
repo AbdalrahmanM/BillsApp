@@ -124,4 +124,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get whatsapp => 'whatsapp';
+
+  @override
+  String get ads => 'Ads';
+
+  @override
+  String get visitWebsite => 'Visit Website';
 }

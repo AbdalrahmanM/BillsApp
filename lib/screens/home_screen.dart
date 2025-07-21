@@ -7,6 +7,9 @@ import '../screens/login_screen.dart'; // <-- Add this import for navigation
 import 'bill_details_screen.dart'; // تأكد من وجود هذه الصفحة
 import 'theme_controller.dart'; // import your controller
 import 'announcements.dart';
+import 'adspage.dart';
+import 'dart:ui';
+import 'package:flutter/foundation.dart'; // أضف هذا السطر في الأعلى
 
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -407,6 +410,80 @@ class _HomeScreenState extends State<HomeScreen> {
             style: const TextStyle(fontSize: 16, color: Colors.grey),
           ),
           const SizedBox(height: 20),
+          // بطاقة الإعلانات
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AdsPage()),
+              );
+            },
+            child: Container(
+              height: 110,
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(18),
+                image: const DecorationImage(
+                  image: AssetImage('lib/assets/ads.png'), // ضع صورة مناسبة هنا
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: Stack(
+                children: [
+                  // طبقة تغويش
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(18),
+                    child: kReleaseMode
+                        ? BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                            child: Container(
+                              color: Colors.black.withOpacity(0.25),
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Ads',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 2,
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.black45,
+                                      blurRadius: 8,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        : Container(
+                            color: Colors.black.withOpacity(0.10),
+                            alignment: Alignment.center,
+                            child: Text(
+                              'Ads',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 2,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black45,
+                                    blurRadius: 8,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // ...existing code...
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,

@@ -96,3 +96,8 @@ flutter:
   # see https://flutter.dev/to/font-from-package
   assets:
     - lib/assets/friends.png
+    - lib/assets/ads.png
+    - lib/assets/music.jpg
+    - lib/assets/shopping.jpg
+    - lib/assets/car.jpg
+    - lib/assets/friends.jpg

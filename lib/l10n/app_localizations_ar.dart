@@ -124,4 +124,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get whatsapp => 'واتساب';
+
+  @override
+  String get ads => 'الإعلانات';
+
+  @override
+  String get visitWebsite => 'زيارة الموقع';
 }

@@ -1,5 +1,7 @@
-/*import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'login_screen.dart';
+import '../main.dart';
+import 'package:bills_app/l10n/app_localizations.dart'; // أضف هذا السطر
 
 class AdsPage extends StatelessWidget {
   const AdsPage({super.key});
@@ -89,12 +91,33 @@ class AdsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = const Color(0xFFFAEBD7);
-    final cardColor = Colors.white;
-    final brown = const Color(0xFF8D6E63);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF232323) : const Color(0xFFFAEBD7);
+    final cardColor = isDark ? const Color(0xFF2D2D2D) : Colors.white;
+    final brown = isDark ? Colors.white : const Color(0xFF8D6E63);
 
     return Scaffold(
       backgroundColor: bgColor,
+      appBar: AppBar(
+        backgroundColor: bgColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: brown),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Text(
+          AppLocalizations.of(context)!.ads,
+          style: TextStyle(
+            color: brown,
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: Stack(
           children: [
@@ -107,32 +130,27 @@ class AdsPage extends StatelessWidget {
                 mainAxisSpacing: 16,
                 children: [
                   _AdCard(
-                    image: 'lib/assets/headphones.jpg',
+                    image: 'lib/assets/music.jpg',
                     title: 'Best Quality Headphones',
                     subtitle: 'Experience music like never before.',
-                    bgColor: cardColor,
-                    textColor: brown,
+                    details:
+                        'هذه السماعات توفر جودة صوت رائعة من تسمعها من قبل!',
+                    url: 'https://example.com/headphones',
                   ),
                   _AdCard(
-                    image: 'lib/assets/sale.jpg',
+                    image: 'lib/assets/friends.jpg',
                     title: 'Summer Sale is Here!',
                     subtitle: 'Up to 50% off\nselect styles',
-                    bgColor: const Color(0xFFD18B4E),
-                    textColor: Colors.white,
                   ),
                   _AdCard(
-                    image: 'lib/assets/arrivals.jpg',
+                    image: 'lib/assets/shopping.jpg',
                     title: 'Latest Arrivals in Store',
                     subtitle: 'Check out the new collection today.',
-                    bgColor: cardColor,
-                    textColor: brown,
                   ),
                   _AdCard(
                     image: 'lib/assets/car.jpg',
                     title: 'Drive Away in Your Dream Car',
                     subtitle: 'The best deals are waiting for you.',
-                    bgColor: cardColor,
-                    textColor: brown,
                   ),
                 ],
               ),
@@ -153,7 +171,9 @@ class AdsPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(32),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.brown.withOpacity(0.10),
+                        color: isDark
+                            ? Colors.black.withOpacity(0.10)
+                            : Colors.brown.withOpacity(0.10),
                         blurRadius: 32,
                         offset: const Offset(0, 8),
                       ),
@@ -170,7 +190,7 @@ class AdsPage extends StatelessWidget {
                               Icon(Icons.headset_mic, color: brown, size: 38),
                               const SizedBox(height: 8),
                               Text(
-                                'Support',
+                                AppLocalizations.of(context)!.support,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w900,
                                   fontSize: 18,
@@ -187,7 +207,8 @@ class AdsPage extends StatelessWidget {
                             Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const LoginScreen(),
+                                builder: (context) =>
+                                    LoginScreen(localeNotifier: localeNotifier),
                               ),
                               (route) => false,
                             );
@@ -202,7 +223,7 @@ class AdsPage extends StatelessWidget {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Logout',
+                                AppLocalizations.of(context)!.logout,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w900,
                                   fontSize: 18,
@@ -225,70 +246,211 @@ class AdsPage extends StatelessWidget {
   }
 }
 
-class _AdCard extends StatelessWidget {
+class _AdCard extends StatefulWidget {
   final String image;
   final String title;
   final String subtitle;
-  final Color bgColor;
-  final Color textColor;
+  final String details;
+  final String url;
 
   const _AdCard({
     required this.image,
     required this.title,
     required this.subtitle,
-    required this.bgColor,
-    required this.textColor,
-  });
+    this.details = '',
+    this.url = '',
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<_AdCard> createState() => _AdCardState();
+}
+
+class _AdCardState extends State<_AdCard> {
+  bool _isHovered = false;
+  bool _isPressed = false;
+  bool _isActive = false; // جديد: لتحديد البطاقة المفتوحة
+
+  Color get _currentColor {
+    if (_isActive || _isPressed || _isHovered) {
+      return const Color(0xFFD18B4E); // لون مغاير عند الفتح أو الضغط أو التمرير
+    }
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark ? const Color(0xFF2D2D2D) : Colors.white;
+  }
+
+  Color get _currentTextColor {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark ? Colors.white : const Color(0xFF8D6E63);
+  }
+
+  void _showAdDetails(BuildContext context) async {
+    setState(() => _isActive = true); // عند الفتح يصبح مغاير
+    await showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 350),
+      pageBuilder: (context, anim1, anim2) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.85,
+              height: MediaQuery.of(context).size.height * 0.55,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(28),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(28),
+                    ),
+                    child: Image.asset(
+                      widget.image,
+                      height: 180,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                    child: Column(
+                      children: [
+                        Text(
+                          widget.title,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 24,
+                            color: _currentTextColor,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          widget.subtitle,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: _currentTextColor.withOpacity(0.8),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        if (widget.details.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          Text(
+                            widget.details,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: Colors.brown,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                        const SizedBox(height: 24),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            // افتح الرابط في المتصفح
+                          },
+                          icon: const Icon(Icons.open_in_new),
+                          label: const Text('زيارة الموقع'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.brown,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32,
+                              vertical: 12,
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        return ScaleTransition(
+          scale: CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
+          child: child,
+        );
+      },
+    );
+    setState(() => _isActive = false); // عند الإغلاق يعود اللون الطبيعي
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(24),
-              ),
-              child: Image.asset(
-                image,
-                fit: BoxFit.cover,
-                width: double.infinity,
-              ),
-            ),
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _isPressed = true),
+        onTapUp: (_) => setState(() => _isPressed = false),
+        onTapCancel: () => setState(() => _isPressed = false),
+        onTap: () => _showAdDetails(context),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          decoration: BoxDecoration(
+            color: _currentColor,
+            borderRadius: BorderRadius.circular(24),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: textColor,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
+                  child: Image.asset(
+                    widget.image,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
                   ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: textColor.withOpacity(0.8),
-                  ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: _currentTextColor,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      widget.subtitle,
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: _currentTextColor.withOpacity(0.8),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 }
-*/
