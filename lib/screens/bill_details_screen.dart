@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
+import 'mock_payment_screen.dart';
 
 class BillDetailsScreen extends StatefulWidget {
   final String type;
@@ -55,7 +56,11 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
           .orderBy('month', descending: true)
           .get();
 
-      final bills = snapshot.docs.map((doc) => doc.data()).toList();
+      final bills = snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return data;
+      }).toList();
       // Extract unique years from bills
       final years =
           bills.map((b) => b['year']?.toString() ?? '').toSet().toList()
@@ -753,8 +758,26 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
+                    child: ElevatedButton.icon(
+                      onPressed: isPaid
+                          ? null // إذا كانت مدفوعة لا يمكن الدفع
+                          : () async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => MockPaymentScreen(
+                                    amount: bill['amount']?.toDouble() ?? 0,
+                                    docId: widget.docId,
+                                    billId:
+                                        bill['id'], // تأكد أن كل فاتورة لديها حقل id يساوي documentId
+                                  ),
+                                ),
+                              );
+                              if (result == true) {
+                                // يمكنك هنا إعادة تحميل الفواتير أو عرض رسالة نجاح
+                                await fetchBills();
+                              }
+                            },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.brown,
                         foregroundColor: Colors.white,
@@ -764,8 +787,9 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                         ),
                         elevation: 0,
                       ),
-                      child: Text(
-                        loc.close,
+                      icon: Icon(Icons.credit_card, size: 26), // أيقونة البطاقة
+                      label: Text(
+                        loc.pay ?? "Pay",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,

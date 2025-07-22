@@ -40,5 +40,12 @@
   "contactWhatsApp": "تواصل عبر واتساب",
   "whatsapp":"واتساب",
   "ads": "الإعلانات",
-  "visitWebsite": "زيارة الموقع"
+  "visitWebsite": "زيارة الموقع",
+  "payment": "الدفع",
+  "choosePaymentMethod": "اختر طريقة الدفع",
+  "bankCard": "بطاقة مصرفية",
+  "zainCash": "زين كاش",
+  "cardNumber": "رقم البطاقة",
+  "confirmPayment": "تأكيد الدفع",
+  "pay":"دفع"
 }

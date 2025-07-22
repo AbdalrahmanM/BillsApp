@@ -21,7 +21,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get getHelp => 'Get help';
 
   @override
-  String get phoneNumber => 'Phone number';
+  String get phoneNumber => 'Phone Number';
 
   @override
   String get enterPhoneNumber => 'Enter Phone Number';
@@ -130,4 +130,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get visitWebsite => 'Visit Website';
+
+  @override
+  String get payment => 'Payment';
+
+  @override
+  String get choosePaymentMethod => 'Choose payment method';
+
+  @override
+  String get bankCard => 'Bank Card';
+
+  @override
+  String get zainCash => 'Zain Cash';
+
+  @override
+  String get cardNumber => 'Card Number';
+
+  @override
+  String get confirmPayment => 'Confirm Payment';
+
+  @override
+  String get pay => 'Pay';
 }

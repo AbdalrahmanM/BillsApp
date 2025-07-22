@@ -130,4 +130,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get visitWebsite => 'زيارة الموقع';
+
+  @override
+  String get payment => 'الدفع';
+
+  @override
+  String get choosePaymentMethod => 'اختر طريقة الدفع';
+
+  @override
+  String get bankCard => 'بطاقة مصرفية';
+
+  @override
+  String get zainCash => 'زين كاش';
+
+  @override
+  String get cardNumber => 'رقم البطاقة';
+
+  @override
+  String get confirmPayment => 'تأكيد الدفع';
+
+  @override
+  String get pay => 'دفع';
 }

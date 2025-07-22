@@ -122,7 +122,7 @@ abstract class AppLocalizations {
   /// No description provided for @phoneNumber.
   ///
   /// In en, this message translates to:
-  /// **'Phone number'**
+  /// **'Phone Number'**
   String get phoneNumber;
 
   /// No description provided for @enterPhoneNumber.
@@ -340,6 +340,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Visit Website'**
   String get visitWebsite;
+
+  /// No description provided for @payment.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get payment;
+
+  /// No description provided for @choosePaymentMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose payment method'**
+  String get choosePaymentMethod;
+
+  /// No description provided for @bankCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank Card'**
+  String get bankCard;
+
+  /// No description provided for @zainCash.
+  ///
+  /// In en, this message translates to:
+  /// **'Zain Cash'**
+  String get zainCash;
+
+  /// No description provided for @cardNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Card Number'**
+  String get cardNumber;
+
+  /// No description provided for @confirmPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Payment'**
+  String get confirmPayment;
+
+  /// No description provided for @pay.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay'**
+  String get pay;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
