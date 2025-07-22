@@ -382,6 +382,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pay'**
   String get pay;
+
+  /// No description provided for @billRequestSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill request sent successfully!'**
+  String get billRequestSent;
+
+  /// No description provided for @billRequestAlreadySent.
+  ///
+  /// In en, this message translates to:
+  /// **'A request for this bill has already been sent!'**
+  String get billRequestAlreadySent;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -75,7 +75,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dueDate => 'تاريخ الاستحقاق';
 
   @override
-  String get requestBill => 'طلب الفاتورة';
+  String get requestBill => 'طلب فاتورة';
 
   @override
   String get close => 'إغلاق';
@@ -151,4 +151,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get pay => 'دفع';
+
+  @override
+  String get billRequestSent => 'تم إرسال طلب الفاتورة بنجاح!';
+
+  @override
+  String get billRequestAlreadySent => 'تم إرسال طلب لهذه الفاتورة مسبقاً!';
 }

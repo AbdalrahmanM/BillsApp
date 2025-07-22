@@ -47,5 +47,8 @@
   "zainCash": "زين كاش",
   "cardNumber": "رقم البطاقة",
   "confirmPayment": "تأكيد الدفع",
-  "pay":"دفع"
+  "pay":"دفع",
+  "billRequestSent": "تم إرسال طلب الفاتورة بنجاح!",
+  "requestBill": "طلب فاتورة",
+  "billRequestAlreadySent": "تم إرسال طلب لهذه الفاتورة مسبقاً!"
 }

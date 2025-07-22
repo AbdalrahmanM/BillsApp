@@ -151,4 +151,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pay => 'Pay';
+
+  @override
+  String get billRequestSent => 'Bill request sent successfully!';
+
+  @override
+  String get billRequestAlreadySent => 'A request for this bill has already been sent!';
 }

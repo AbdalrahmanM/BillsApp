@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'mock_payment_screen.dart';
+import 'package:bills_app/widgets/flushbar_helper.dart';
 
 class BillDetailsScreen extends StatefulWidget {
   final String type;
@@ -731,8 +732,46 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () {
-                        // ضع هنا منطق طلب الفاتورة
+                      onPressed: () async {
+                        final userInfo = await fetchUserInfo();
+                        final existing = await FirebaseFirestore.instance
+                            .collection('bill_requests')
+                            .where('userId', isEqualTo: widget.docId)
+                            .where('bill.id', isEqualTo: bill['id'])
+                            .get();
+
+                        if (existing.docs.isNotEmpty) {
+                          // إشعار أن الطلب مكرر
+                          showCustomFlushbar(
+                            context,
+                            message: AppLocalizations.of(
+                              context,
+                            )!.billRequestAlreadySent,
+                            icon: 'lib/assets/lottie/warning.json',
+                            color: Colors.orange,
+                          );
+                          return;
+                        }
+
+                        await FirebaseFirestore.instance
+                            .collection('bill_requests')
+                            .add({
+                              'userId': widget.docId,
+                              'userName': userInfo?['firstName'] ?? '',
+                              'userLastName': userInfo?['lastName'] ?? '',
+                              'userPhone': userInfo?['phone'] ?? '',
+                              'bill': bill,
+                              'timestamp': FieldValue.serverTimestamp(),
+                            });
+                        Navigator.pop(context);
+                        showCustomFlushbar(
+                          context,
+                          message: AppLocalizations.of(
+                            context,
+                          )!.billRequestSent,
+                          icon: 'lib/assets/lottie/success.json',
+                          color: Colors.green,
+                        );
                       },
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(color: Colors.green, width: 2),
