@@ -50,5 +50,6 @@
   "pay":"دفع",
   "billRequestSent": "تم إرسال طلب الفاتورة بنجاح!",
   "requestBill": "طلب فاتورة",
-  "billRequestAlreadySent": "تم إرسال طلب لهذه الفاتورة مسبقاً!"
+  "billRequestAlreadySent": "تم إرسال طلب لهذه الفاتورة مسبقاً!",
+  "billingHub": "مركز الفواتير"
 }

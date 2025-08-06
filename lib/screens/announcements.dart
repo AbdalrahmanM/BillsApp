@@ -1,8 +1,9 @@
+import 'dart:ui'; // أضف هذا السطر في الأعلى
 import 'package:flutter/material.dart';
 import 'package:bills_app/l10n/app_localizations.dart';
 
 class AnnouncementsScreen extends StatelessWidget {
-  const AnnouncementsScreen({Key? key}) : super(key: key);
+  const AnnouncementsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -10,63 +11,85 @@ class AnnouncementsScreen extends StatelessWidget {
     final bgColor = isDark ? const Color(0xFF232323) : const Color(0xFFFDE9D9);
     final loc = AppLocalizations.of(context)!; // Get localization instance
 
-    return Container(
-      color: bgColor,
-      child: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 32),
-            Text(
-              loc.announcements, // Localized
-              style: TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-                color: isDark
-                    ? Colors.lightBlueAccent
-                    : const Color(0xFF0070F3),
-                letterSpacing: 1,
-              ),
-            ),
-            const SizedBox(height: 32),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 24,
-                  crossAxisSpacing: 16,
-                  childAspectRatio: 0.85,
-                  children: [
-                    _AnnouncementCard(
-                      title: loc.maintenanceNoticeTitle,
-                      description: loc.maintenanceNoticeDesc,
-                      icon: null,
-                      iconColor: null,
-                    ),
-                    _AnnouncementCard(
-                      title: loc.newPaymentOptionTitle,
-                      description: loc.newPaymentOptionDesc,
-                      icon: Icons.account_balance_wallet_outlined,
-                      iconColor: const Color(0xFFBDBDBD),
-                    ),
-                    _AnnouncementCard(
-                      title: loc.specialOfferTitle,
-                      description: loc.specialOfferDesc,
-                      icon: Icons.percent,
-                      iconColor: const Color(0xFFFF8A65),
-                    ),
-                    _AnnouncementCard(
-                      title: loc.holidayAlertTitle,
-                      description: loc.holidayAlertDesc,
-                      icon: Icons.error_outline,
-                      iconColor: const Color(0xFFFFB300),
-                    ),
-                  ],
+    return Scaffold(
+      backgroundColor: bgColor,
+      body: Stack(
+        children: [
+          // الخلفية المغوشة
+          Positioned.fill(
+            child: Stack(
+              children: [
+                Image.asset(
+                  'lib/assets/building.jpg',
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
                 ),
-              ),
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                  child: Container(color: Colors.white.withOpacity(0.12)),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          // محتوى الشاشة
+          SafeArea(
+            child: Column(
+              children: [
+                const SizedBox(height: 32),
+                Text(
+                  loc.announcements, // Localized
+                  style: TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: isDark
+                        ? Colors.lightBlueAccent
+                        : const Color(0xFF0070F3),
+                    letterSpacing: 1,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 24,
+                      crossAxisSpacing: 16,
+                      childAspectRatio: 0.85,
+                      children: [
+                        _AnnouncementCard(
+                          title: loc.maintenanceNoticeTitle,
+                          description: loc.maintenanceNoticeDesc,
+                          icon: null,
+                          iconColor: null,
+                        ),
+                        _AnnouncementCard(
+                          title: loc.newPaymentOptionTitle,
+                          description: loc.newPaymentOptionDesc,
+                          icon: Icons.account_balance_wallet_outlined,
+                          iconColor: const Color(0xFFBDBDBD),
+                        ),
+                        _AnnouncementCard(
+                          title: loc.specialOfferTitle,
+                          description: loc.specialOfferDesc,
+                          icon: Icons.percent,
+                          iconColor: const Color(0xFFFF8A65),
+                        ),
+                        _AnnouncementCard(
+                          title: loc.holidayAlertTitle,
+                          description: loc.holidayAlertDesc,
+                          icon: Icons.error_outline,
+                          iconColor: const Color(0xFFFFB300),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

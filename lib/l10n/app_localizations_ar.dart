@@ -157,4 +157,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get billRequestAlreadySent => 'تم إرسال طلب لهذه الفاتورة مسبقاً!';
+
+  @override
+  String get billingHub => 'مركز الفواتير';
 }

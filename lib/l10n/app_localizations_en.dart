@@ -157,4 +157,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get billRequestAlreadySent => 'A request for this bill has already been sent!';
+
+  @override
+  String get billingHub => 'Billing Hub';
 }

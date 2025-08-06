@@ -394,6 +394,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A request for this bill has already been sent!'**
   String get billRequestAlreadySent;
+
+  /// No description provided for @billingHub.
+  ///
+  /// In en, this message translates to:
+  /// **'Billing Hub'**
+  String get billingHub;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -49,5 +49,6 @@
   "pay":"Pay",
   "billRequestSent": "Bill request sent successfully!",
   "requestBill": "Request Bill",
-  "billRequestAlreadySent": "A request for this bill has already been sent!"
+  "billRequestAlreadySent": "A request for this bill has already been sent!",
+  "billingHub": "Billing Hub"
 }

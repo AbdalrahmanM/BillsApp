@@ -5,6 +5,7 @@ import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'mock_payment_screen.dart';
 import 'package:bills_app/widgets/flushbar_helper.dart';
+import 'dart:ui';
 
 class BillDetailsScreen extends StatefulWidget {
   final String type;
@@ -130,13 +131,13 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF232323) : const Color(0xFFFAEBD7);
+    final bgColor = Colors.transparent; // <-- اجعلها شفافة
     final cardColor = isDark ? const Color(0xFF2D2D2D) : Colors.white;
     final textColor = isDark ? Colors.white : const Color(0xFF6D4C41);
     final loc = AppLocalizations.of(context)!;
     final title = "${loc.bills} ${_localizedType(context, widget.type)}";
     final theme = ThemeData.light().copyWith(
-      scaffoldBackgroundColor: const Color(0xFFFDF6EC),
+      scaffoldBackgroundColor: Colors.transparent, // <-- اجعلها شفافة
       cardColor: Colors.white,
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.brown,
@@ -148,169 +149,245 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
       data: theme,
       child: Scaffold(
         backgroundColor: bgColor,
-        appBar: AppBar(
-          title: Text(
-            title,
-            style: TextStyle(
-              color: isDark ? Colors.white : Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          backgroundColor: isDark ? const Color(0xFF2D2D2D) : Colors.brown,
-          iconTheme: IconThemeData(color: Colors.white),
-          elevation: 0,
-        ),
-        body: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : Column(
+        body: Stack(
+          children: [
+            // الخلفية المشوشة (كما هي)
+            Positioned.fill(
+              child: Stack(
                 children: [
-                  // Filters
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
+                  Image.asset(
+                    'lib/assets/building.jpg',
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
+                  BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                    child: Container(color: Colors.white.withOpacity(0.12)),
+                  ),
+                ],
+              ),
+            ),
+            // شريط العنوان الدائري
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  top: 50.0,
+                  left: 12.0,
+                  right: 12.0,
+                  bottom: 12.0,
+                ), // <-- هنا التعديل
+                child: Container(
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? Colors.black.withOpacity(0.18)
+                        : Colors.white.withOpacity(0.85),
+                    borderRadius: BorderRadius.circular(22),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 18,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.brown),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                          color: isDark ? Colors.white : Colors.brown.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // محتوى الصفحة مع padding من الأعلى
+            Padding(
+              padding: const EdgeInsets.only(
+                top: 115,
+              ), // حتى لا يغطيه الشريط العلوي
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : Column(
                       children: [
-                        // فلتر الحالة
-                        Expanded(
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              value: selectedStatus,
-                              isExpanded: true,
-                              dropdownColor: cardColor,
-                              style: TextStyle(
-                                color: isDark ? Colors.white : Colors.brown,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              iconEnabledColor: isDark
-                                  ? Colors.white
-                                  : Colors.brown,
-                              items: ['All', 'Paid', 'Unpaid']
-                                  .map(
-                                    (status) => DropdownMenuItem(
-                                      value: status,
-                                      child: Text(status),
+                        // الفلاتر
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              // فلتر الحالة
+                              Expanded(
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    value: selectedStatus,
+                                    isExpanded: true,
+                                    dropdownColor: cardColor,
+                                    style: TextStyle(
+                                      color: isDark
+                                          ? Colors.white
+                                          : Colors.brown,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                  )
-                                  .toList(),
-                              onChanged: (value) {
-                                if (value != null) {
-                                  setState(() {
-                                    selectedStatus = value;
-                                    applyFilters();
-                                  });
-                                }
-                              },
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        // فلتر الشهر
-                        Expanded(
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              hint: Text(
-                                "Month",
-                                style: TextStyle(
-                                  color: isDark ? Colors.white : Colors.brown,
-                                  fontWeight: FontWeight.bold,
+                                    iconEnabledColor: isDark
+                                        ? Colors.white
+                                        : Colors.brown,
+                                    items: ['All', 'Paid', 'Unpaid']
+                                        .map(
+                                          (status) => DropdownMenuItem(
+                                            value: status,
+                                            child: Text(status),
+                                          ),
+                                        )
+                                        .toList(),
+                                    onChanged: (value) {
+                                      if (value != null) {
+                                        setState(() {
+                                          selectedStatus = value;
+                                          applyFilters();
+                                        });
+                                      }
+                                    },
+                                  ),
                                 ),
                               ),
-                              value: selectedMonth,
-                              isExpanded: true,
-                              dropdownColor: cardColor,
-                              style: TextStyle(
-                                color: isDark ? Colors.white : Colors.brown,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              iconEnabledColor: isDark
-                                  ? Colors.white
-                                  : Colors.brown,
-                              items: monthNames
-                                  .map(
-                                    (month) => DropdownMenuItem(
-                                      value: month,
-                                      child: Text(month),
+                              const SizedBox(width: 10),
+                              // فلتر الشهر
+                              Expanded(
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    hint: Text(
+                                      "Month",
+                                      style: TextStyle(
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.brown,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  )
-                                  .toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedMonth = value;
-                                  applyFilters();
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        // فلتر السنة
-                        Expanded(
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              hint: Text(
-                                "Year",
-                                style: TextStyle(
-                                  color: isDark ? Colors.white : Colors.brown,
-                                  fontWeight: FontWeight.bold,
+                                    value: selectedMonth,
+                                    isExpanded: true,
+                                    dropdownColor: cardColor,
+                                    style: TextStyle(
+                                      color: isDark
+                                          ? Colors.white
+                                          : Colors.brown,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    iconEnabledColor: isDark
+                                        ? Colors.white
+                                        : Colors.brown,
+                                    items: monthNames
+                                        .map(
+                                          (month) => DropdownMenuItem(
+                                            value: month,
+                                            child: Text(month),
+                                          ),
+                                        )
+                                        .toList(),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectedMonth = value;
+                                        applyFilters();
+                                      });
+                                    },
+                                  ),
                                 ),
                               ),
-                              value: selectedYear,
-                              isExpanded: true,
-                              dropdownColor: cardColor,
-                              style: TextStyle(
-                                color: isDark ? Colors.white : Colors.brown,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              iconEnabledColor: isDark
-                                  ? Colors.white
-                                  : Colors.brown,
-                              items: availableYears
-                                  .map(
-                                    (year) => DropdownMenuItem(
-                                      value: year,
-                                      child: Text(year),
+                              const SizedBox(width: 10),
+                              // فلتر السنة
+                              Expanded(
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    hint: Text(
+                                      "Year",
+                                      style: TextStyle(
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.brown,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  )
-                                  .toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedYear = value;
-                                  applyFilters();
-                                });
-                              },
-                            ),
+                                    value: selectedYear,
+                                    isExpanded: true,
+                                    dropdownColor: cardColor,
+                                    style: TextStyle(
+                                      color: isDark
+                                          ? Colors.white
+                                          : Colors.brown,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    iconEnabledColor: isDark
+                                        ? Colors.white
+                                        : Colors.brown,
+                                    items: availableYears
+                                        .map(
+                                          (year) => DropdownMenuItem(
+                                            value: year,
+                                            child: Text(year),
+                                          ),
+                                        )
+                                        .toList(),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectedYear = value;
+                                        applyFilters();
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Pull-to-refresh and AnimatedList
+                        Expanded(
+                          child: RefreshIndicator(
+                            onRefresh: () async {
+                              setState(() {
+                                isLoading = true;
+                              });
+                              await fetchBills();
+                              applyFilters();
+                            },
+                            child: filteredBills.isEmpty
+                                ? const Center(child: Text("No bills found."))
+                                : ListView.builder(
+                                    padding: const EdgeInsets.all(16),
+                                    itemCount: filteredBills.length,
+                                    itemBuilder: (context, index) {
+                                      final bill = filteredBills[index];
+                                      return GestureDetector(
+                                        onTap: () =>
+                                            _showBillDetailsModal(bill),
+                                        child: _buildBillCard(
+                                          bill,
+                                          Colors.teal,
+                                        ),
+                                      );
+                                    },
+                                  ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-
-                  // Pull-to-refresh and AnimatedList
-                  Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: () async {
-                        setState(() {
-                          isLoading = true;
-                        });
-                        await fetchBills();
-                        applyFilters();
-                      },
-                      child: filteredBills.isEmpty
-                          ? const Center(child: Text("No bills found."))
-                          : ListView.builder(
-                              padding: const EdgeInsets.all(16),
-                              itemCount: filteredBills.length,
-                              itemBuilder: (context, index) {
-                                final bill = filteredBills[index];
-                                return GestureDetector(
-                                  onTap: () => _showBillDetailsModal(bill),
-                                  child: _buildBillCard(bill, Colors.teal),
-                                );
-                              },
-                            ),
-                    ),
-                  ),
-                ],
-              ),
+            ),
+          ],
+        ),
       ),
     );
   }

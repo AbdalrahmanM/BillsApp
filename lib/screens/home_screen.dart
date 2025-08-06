@@ -49,153 +49,129 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _showHelpModal() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      backgroundColor: isDark ? const Color(0xFF232323) : Colors.white,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(0.25),
       builder: (context) {
-        return Container(
-          decoration: BoxDecoration(
-            gradient: isDark
-                ? const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF232323), Color(0xFF2D2D2D)],
-                  )
-                : const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFFFFF3E0), Color(0xFFFFE0B2)],
-                  ),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: isDark
-                      ? const LinearGradient(
-                          colors: [Color(0xFF8D6E63), Color(0xFF4E342E)],
-                        )
-                      : const LinearGradient(
-                          colors: [Color(0xFFFFB300), Color(0xFF8D6E63)],
-                        ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: isDark
-                          ? Colors.black.withOpacity(0.3)
-                          : const Color(0x338D6E63),
-                      blurRadius: 16,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(20),
-                child: const Icon(
-                  Icons.headset_mic,
-                  color: Colors.white,
-                  size: 44,
+        return ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: isDark
+                    ? Colors.black.withOpacity(0.4)
+                    : Colors.white.withOpacity(0.6),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(32),
                 ),
               ),
-              const SizedBox(height: 18),
-              Text(
-                AppLocalizations.of(context)!.supportTitle, // Localized title
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : const Color(0xFF6D4C41),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                AppLocalizations.of(
-                  context,
-                )!.supportDesc, // Localized description
-                style: TextStyle(
-                  fontSize: 16,
-                  color: isDark
-                      ? Colors.brown.shade100
-                      : const Color(0xFF8D6E63),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 28),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
+                  // أيقونة
+                  Container(
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xFF8D6E63),
+                    ),
+                    padding: const EdgeInsets.all(18),
+                    child: const Icon(
+                      Icons.headset_mic,
+                      color: Colors.white,
+                      size: 36,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  // العنوان (مترجم)
+                  Text(
+                    AppLocalizations.of(context)!.supportTitle,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : const Color(0xFF5D4037),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 6),
+                  // الوصف (مترجم)
+                  Text(
+                    AppLocalizations.of(context)!.supportDesc,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: isDark
+                          ? Colors.grey.shade300
+                          : const Color(0xFF6D4C41),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  // زر البريد (مترجم)
                   ElevatedButton.icon(
                     onPressed: () {
                       Navigator.pop(context);
                       _launchEmail();
                     },
                     icon: const Icon(Icons.email_outlined),
-                    label: Text(
-                      AppLocalizations.of(context)!.contactEmail,
-                    ), // Localized
+                    label: Text(AppLocalizations.of(context)!.contactEmail),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isDark
-                          ? Colors.brown.shade700
-                          : const Color(0xFF6D4C41),
+                      backgroundColor: const Color(0xFF6D4C41),
                       foregroundColor: Colors.white,
                       minimumSize: const Size.fromHeight(48),
-                      textStyle: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 0,
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
+                  // زر واتساب (مترجم)
                   ElevatedButton.icon(
                     onPressed: () {
                       Navigator.pop(context);
                       _launchWhatsApp();
                     },
-                    icon: const Icon(Icons.chat_bubble, color: Colors.white),
-                    label: Text(
-                      AppLocalizations.of(context)!.contactWhatsApp,
-                    ), // Localized
+                    icon: const Icon(Icons.chat_bubble),
+                    label: Text(AppLocalizations.of(context)!.contactWhatsApp),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF25D366),
                       foregroundColor: Colors.white,
                       minimumSize: const Size.fromHeight(48),
-                      textStyle: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 0,
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      AppLocalizations.of(context)!.getHelp,
+                      style: TextStyle(
+                        color: isDark
+                            ? Colors.grey.shade300
+                            : const Color(0xFF6D4C41),
+                      ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 18),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'Send Feedback', // You can add this to ARB files if needed
-                  style: TextStyle(
-                    color: isDark
-                        ? Colors.brown.shade100
-                        : const Color(0xFF8D6E63),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         );
       },
@@ -259,123 +235,190 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: bgColor,
-      appBar: AppBar(
-        backgroundColor: bgColor,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        title: null,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Theme.of(context).brightness == Brightness.dark
-                  ? Icons
-                        .light_mode // ☀️ أيقونة جديدة للوضع الفاتح
-                  : Icons.dark_mode, // 🌙 أيقونة جديدة للوضع الداكن
-              color: iconColor,
-            ),
-            onPressed: () {
-              final isDark = Theme.of(context).brightness == Brightness.dark;
-              themeController.setTheme(
-                isDark ? ThemeMode.light : ThemeMode.dark,
-              );
-              setState(() {});
-            },
-            tooltip: Theme.of(context).brightness == Brightness.dark
-                ? 'Switch to Light Mode'
-                : 'Switch to Dark Mode',
-          ),
-        ],
-      ),
       body: SafeArea(
         child: Stack(
           children: [
-            isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : PageView(
-                    children: [
-                      _buildBillsPage(isDark),
-                      const AnnouncementsScreen(),
-                    ],
+            // الخلفية المشوشة
+            Positioned.fill(
+              child: Stack(
+                children: [
+                  Image.asset(
+                    'lib/assets/building.jpg',
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
                   ),
-            Align(
-              alignment: Alignment.bottomCenter,
+                  BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                    child: Container(color: Colors.white.withOpacity(0.12)),
+                  ),
+                ],
+              ),
+            ),
+            // الشريط العلوي المخصص
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
               child: Padding(
-                padding: const EdgeInsets.only(
-                  bottom: 24.0,
-                  left: 16.0,
-                  right: 16.0,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12.0,
+                  vertical: 12.0,
                 ),
                 child: Container(
-                  width: double.infinity,
-                  height: 92,
+                  height: 60,
                   decoration: BoxDecoration(
-                    color: cardColor,
-                    borderRadius: BorderRadius.circular(32),
+                    color: isDark
+                        ? Colors.black.withOpacity(0.18)
+                        : Colors.white.withOpacity(0.85),
+                    borderRadius: BorderRadius.circular(22),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.brown.withOpacity(0.10),
-                        blurRadius: 32,
-                        offset: const Offset(0, 8),
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 18,
+                        offset: const Offset(0, 6),
                       ),
                     ],
                   ),
                   child: Row(
                     children: [
+                      const SizedBox(width: 16),
+                      Icon(
+                        Icons.dashboard,
+                        color: Colors.brown.shade700,
+                        size: 28,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        "Billing Hub",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                          color: isDark ? Colors.white : Colors.brown.shade700,
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: Icon(
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Icons.light_mode
+                              : Icons.dark_mode,
+                          color: isDark ? Colors.white : Colors.brown.shade700,
+                        ),
+                        onPressed: () {
+                          final isDark =
+                              Theme.of(context).brightness == Brightness.dark;
+                          themeController.setTheme(
+                            isDark ? ThemeMode.light : ThemeMode.dark,
+                          );
+                          setState(() {});
+                        },
+                        tooltip: Theme.of(context).brightness == Brightness.dark
+                            ? 'Switch to Light Mode'
+                            : 'Switch to Dark Mode',
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // باقي محتوى الصفحة (PageView وغيره)
+            Padding(
+              padding: const EdgeInsets.only(
+                top: 84.0,
+              ), // حتى لا يغطي الشريط العلوي
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : PageView(
+                      children: [
+                        _buildBillsPage(isDark),
+                        const AnnouncementsScreen(),
+                      ],
+                    ),
+            ),
+            // الشريط السفلي كما هو
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  bottom: 18.0,
+                  left: 12.0,
+                  right: 12.0,
+                ),
+                child: Container(
+                  width: double.infinity,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFFFAFAFA).withOpacity(0.10)
+                        : Colors.white.withOpacity(0.85),
+                    borderRadius: BorderRadius.circular(32),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.07),
+                        blurRadius: 18,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // زر الدعم
                       Expanded(
-                        child: GestureDetector(
-                          onTap: _showHelpModal,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.headset_mic,
-                                color: iconColor,
-                                size: 38,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                AppLocalizations.of(context)!.support,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 18,
-                                  color: textColor,
-                                ),
-                              ),
-                            ],
+                        child: TextButton.icon(
+                          onPressed: _showHelpModal,
+                          icon: Icon(
+                            Icons.headset_mic,
+                            color: Colors.brown.shade700,
+                          ),
+                          label: Text(
+                            AppLocalizations.of(context)!.support,
+                            style: TextStyle(
+                              color: Colors.brown.shade700,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.brown.shade700,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
                         ),
                       ),
+                      const SizedBox(width: 8),
+                      // زر تسجيل الخروج
                       Expanded(
-                        child: GestureDetector(
-                          onTap: () {
+                        child: TextButton.icon(
+                          onPressed: () {
                             Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => LoginScreen(
-                                  localeNotifier: localeNotifier,
-                                ), // <-- Pass localeNotifier here
+                                builder: (_) =>
+                                    LoginScreen(localeNotifier: localeNotifier),
                               ),
                               (route) => false,
                             );
                           },
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.logout_outlined,
-                                color: iconColor,
-                                size: 38,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                AppLocalizations.of(context)!.logout,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 18,
-                                  color: textColor,
-                                ),
-                              ),
-                            ],
+                          icon: const Icon(Icons.logout, color: Colors.red),
+                          label: Text(
+                            AppLocalizations.of(context)!.logout,
+                            style: TextStyle(
+                              color: Colors.red.shade700,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.red.shade700,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
                         ),
                       ),
@@ -391,25 +434,70 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBillsPage(bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
+    final cardTextColor = isDark ? Colors.white : const Color(0xFF6D4C41);
+    final cardSubTextColor = isDark ? Colors.brown.shade100 : Colors.grey;
+    final cardBgColors = [
+      isDark ? Colors.lightBlue.shade700 : Colors.lightBlue.shade100,
+      isDark ? Colors.orange.shade700 : Colors.orange.shade100,
+      isDark ? Colors.blue.shade700 : Colors.blue.shade100,
+      isDark ? Colors.amber.shade700 : Colors.amber.shade100,
+    ];
+
+    return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const CircleAvatar(
-            radius: 30,
-            backgroundImage: AssetImage('lib/assets/profile.jpg'),
+          // بطاقة الترحيب
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF2D2D2D) : Colors.white,
+              borderRadius: BorderRadius.circular(22),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.brown.withOpacity(0.08),
+                  blurRadius: 18,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 28,
+                  backgroundColor: Colors.brown.shade100,
+                  child: Icon(
+                    Icons.person,
+                    color: Colors.brown.shade700,
+                    size: 36,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${AppLocalizations.of(context)!.hello}, ${widget.userName} ${widget.lastName}",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: cardTextColor,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        AppLocalizations.of(context)!.welcomeBack,
+                        style: TextStyle(fontSize: 15, color: cardSubTextColor),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 10),
-          Text(
-            "${AppLocalizations.of(context)!.hello}, ${widget.userName} ${widget.lastName}",
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            AppLocalizations.of(context)!.welcomeBack,
-            style: const TextStyle(fontSize: 16, color: Colors.grey),
-          ),
-          const SizedBox(height: 20),
           // بطاقة الإعلانات
           GestureDetector(
             onTap: () {
@@ -421,17 +509,16 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Container(
               height: 110,
               width: double.infinity,
-              margin: const EdgeInsets.only(bottom: 12),
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(18),
                 image: const DecorationImage(
-                  image: AssetImage('lib/assets/ads.png'), // ضع صورة مناسبة هنا
+                  image: AssetImage('lib/assets/ads.png'),
                   fit: BoxFit.cover,
                 ),
               ),
               child: Stack(
                 children: [
-                  // طبقة تغويش
                   ClipRRect(
                     borderRadius: BorderRadius.circular(18),
                     child: kReleaseMode
@@ -479,16 +566,28 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                   ),
+                  Positioned(
+                    right: 12,
+                    top: 12,
+                    child: Icon(
+                      Icons.chevron_right,
+                      color: Colors.white,
+                      size: 32,
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
-          // ...existing code...
-          Expanded(
+          // شبكة البطاقات الأربع
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: GridView.count(
               crossAxisCount: 2,
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               children: [
                 _buildFromData('water', isDark),
                 _buildFromData('gas', isDark),
@@ -497,6 +596,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
+          const SizedBox(
+            height: 110,
+          ), // مساحة للأسفل حتى لا يغطيها البار السفلي
         ],
       ),
     );
@@ -521,7 +623,7 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
       child: _buildBillCard(
-        "${_translateType(type)}",
+        _translateType(type),
         "\$${bill['amount']}",
         bill['status'],
         getIcon(type),

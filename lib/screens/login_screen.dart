@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../screens/home_screen.dart'; // تأكد من المسار الصحيح
 import 'package:bills_app/l10n/app_localizations.dart';
+import 'dart:ui'; // مهم للـ ImageFilter
 
 class LoginScreen extends StatefulWidget {
   final ValueNotifier<Locale> localeNotifier;
@@ -85,6 +86,7 @@ class _LoginScreenState extends State<LoginScreen>
               ),
             ),
           );
+          return;
         }
       }
       ScaffoldMessenger.of(context).showSnackBar(
@@ -219,11 +221,42 @@ class _LoginScreenState extends State<LoginScreen>
       backgroundColor: const Color(0xFFFAEBD7),
       body: Stack(
         children: [
+          // صورة الخلفية مع Blur
+          Positioned.fill(
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: Image.asset('lib/assets/building.jpg', fit: BoxFit.cover),
+            ),
+          ),
+          // محتوى الصفحة
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(height: 80),
-              Image.asset('lib/assets/friends.png', height: 180),
+              Center(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(32),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.brown.withOpacity(0.15),
+                        blurRadius: 24,
+                        offset: Offset(0, 8),
+                      ),
+                    ],
+                    border: Border.all(color: Colors.brown.shade200, width: 4),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(32),
+                    child: Image.asset(
+                      'lib/assets/building.jpg',
+                      height: 160,
+                      width: 280,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 30),
               Text(
                 AppLocalizations.of(context)!.hello,
@@ -239,6 +272,7 @@ class _LoginScreenState extends State<LoginScreen>
                 padding: const EdgeInsets.symmetric(horizontal: 32.0),
                 child: SizedBox(
                   width: double.infinity,
+
                   child: ElevatedButton(
                     onPressed: toggleForm,
                     style: ElevatedButton.styleFrom(
@@ -246,7 +280,7 @@ class _LoginScreenState extends State<LoginScreen>
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
-                      backgroundColor: const Color(0xFF8B0000),
+                      backgroundColor: const Color(0xFF1E4FB2),
                       foregroundColor: Colors.white,
                       textStyle: const TextStyle(
                         fontSize: 16,
@@ -385,7 +419,7 @@ class _LoginScreenState extends State<LoginScreen>
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30),
                             ),
-                            backgroundColor: const Color(0xFF8B0000),
+                            backgroundColor: const Color(0xFF1E4FB2),
                             foregroundColor: Colors.white,
                             textStyle: const TextStyle(
                               fontSize: 16,
