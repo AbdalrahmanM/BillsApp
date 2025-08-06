@@ -84,7 +84,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get bills => 'فواتير';
 
   @override
-  String get announcements => 'الإعلانات';
+  String get announcements => 'التبليغات';
 
   @override
   String get maintenanceNoticeTitle => 'إشعار\nالصيانة';
@@ -160,4 +160,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get billingHub => 'مركز الفواتير';
+
+  @override
+  String get all => 'الكل';
+
+  @override
+  String get month => 'الشهر';
+
+  @override
+  String get year => 'السنة';
+
+  @override
+  String get filter => 'فلتر';
+
+  @override
+  String get reset => 'اعادة ضبط';
+
+  @override
+  String get apply => 'تطبيق';
+
+  @override
+  String get cancel => 'الغاء';
 }

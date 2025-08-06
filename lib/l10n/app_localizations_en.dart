@@ -160,4 +160,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get billingHub => 'Billing Hub';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get month => 'Month';
+
+  @override
+  String get year => 'Year';
+
+  @override
+  String get filter => 'Filter';
+
+  @override
+  String get reset => 'Reset';
+
+  @override
+  String get apply => 'Apply';
+
+  @override
+  String get cancel => 'Cancel';
 }

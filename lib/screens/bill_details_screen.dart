@@ -21,7 +21,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
   List<Map<String, dynamic>> allBills = [];
   List<Map<String, dynamic>> filteredBills = [];
   bool isLoading = true;
-  String selectedStatus = 'All';
+  String selectedStatus = 'all';
   String? selectedMonth;
   String? selectedYear;
   final List<String> monthNames = [
@@ -95,7 +95,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
   void applyFilters() {
     List<Map<String, dynamic>> filtered = allBills;
 
-    if (selectedStatus != 'All') {
+    if (selectedStatus != 'all') {
       filtered = filtered
           .where(
             (bill) =>
@@ -229,125 +229,118 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
                             children: [
-                              // فلتر الحالة
                               Expanded(
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<String>(
-                                    value: selectedStatus,
-                                    isExpanded: true,
-                                    dropdownColor: cardColor,
-                                    style: TextStyle(
-                                      color: isDark
-                                          ? Colors.white
-                                          : Colors.brown,
-                                      fontWeight: FontWeight.bold,
+                                child: ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.brown.shade700,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
                                     ),
-                                    iconEnabledColor: isDark
-                                        ? Colors.white
-                                        : Colors.brown,
-                                    items: ['All', 'Paid', 'Unpaid']
-                                        .map(
-                                          (status) => DropdownMenuItem(
-                                            value: status,
-                                            child: Text(status),
-                                          ),
-                                        )
-                                        .toList(),
-                                    onChanged: (value) {
-                                      if (value != null) {
-                                        setState(() {
-                                          selectedStatus = value;
-                                          applyFilters();
-                                        });
-                                      }
-                                    },
+                                    padding: const EdgeInsets.symmetric(vertical: 14),
                                   ),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              // فلتر الشهر
-                              Expanded(
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<String>(
-                                    hint: Text(
-                                      "Month",
-                                      style: TextStyle(
-                                        color: isDark
-                                            ? Colors.white
-                                            : Colors.brown,
-                                        fontWeight: FontWeight.bold,
+                                  icon: const Icon(Icons.filter_alt_rounded),
+                                  label: Text(loc.filter),
+                                  onPressed: () async {
+                                    await showModalBottomSheet(
+                                      context: context,
+                                      shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
                                       ),
-                                    ),
-                                    value: selectedMonth,
-                                    isExpanded: true,
-                                    dropdownColor: cardColor,
-                                    style: TextStyle(
-                                      color: isDark
-                                          ? Colors.white
-                                          : Colors.brown,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    iconEnabledColor: isDark
-                                        ? Colors.white
-                                        : Colors.brown,
-                                    items: monthNames
-                                        .map(
-                                          (month) => DropdownMenuItem(
-                                            value: month,
-                                            child: Text(month),
+                                      backgroundColor: isDark ? cardColor : Colors.white,
+                                      builder: (context) {
+                                        String tempStatus = selectedStatus;
+                                        String? tempMonth = selectedMonth;
+                                        String? tempYear = selectedYear;
+                                        return StatefulBuilder(
+                                          builder: (context, setModalState) => Padding(
+                                            padding: const EdgeInsets.all(24.0),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(loc.filter, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: isDark ? Colors.white : Colors.brown)),
+                                                const SizedBox(height: 18),
+                                                Text(loc.status, style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.brown)),
+                                                Wrap(
+                                                  spacing: 10,
+                                                  children: [
+                                                    ChoiceChip(
+                                                      label: Text(loc.all),
+                                                      selected: tempStatus == 'all',
+                                                      onSelected: (_) => setModalState(() => tempStatus = 'all'),
+                                                    ),
+                                                    ChoiceChip(
+                                                      label: Text(loc.paid),
+                                                      selected: tempStatus == 'paid',
+                                                      onSelected: (_) => setModalState(() => tempStatus = 'paid'),
+                                                    ),
+                                                    ChoiceChip(
+                                                      label: Text(loc.unpaid),
+                                                      selected: tempStatus == 'unpaid',
+                                                      onSelected: (_) => setModalState(() => tempStatus = 'unpaid'),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 18),
+                                                Text(loc.month, style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.brown)),
+                                                Wrap(
+                                                  spacing: 8,
+                                                  children: monthNames.map((month) => ChoiceChip(
+                                                    label: Text(month),
+                                                    selected: tempMonth == month,
+                                                    onSelected: (_) => setModalState(() => tempMonth = tempMonth == month ? null : month),
+                                                  )).toList(),
+                                                ),
+                                                const SizedBox(height: 18),
+                                                Text(loc.year, style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.brown)),
+                                                Wrap(
+                                                  spacing: 8,
+                                                  children: availableYears.map((year) => ChoiceChip(
+                                                    label: Text(year),
+                                                    selected: tempYear == year,
+                                                    onSelected: (_) => setModalState(() => tempYear = tempYear == year ? null : year),
+                                                  )).toList(),
+                                                ),
+                                                const SizedBox(height: 24),
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: OutlinedButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(context);
+                                                        },
+                                                        child: Text(loc.cancel),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 12),
+                                                    Expanded(
+                                                      child: ElevatedButton(
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: Colors.brown,
+                                                          foregroundColor: Colors.white,
+                                                        ),
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            selectedStatus = tempStatus;
+                                                            selectedMonth = tempMonth;
+                                                            selectedYear = tempYear;
+                                                            applyFilters();
+                                                          });
+                                                          Navigator.pop(context);
+                                                        },
+                                                        child: Text(loc.apply),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                        )
-                                        .toList(),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        selectedMonth = value;
-                                        applyFilters();
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              // فلتر السنة
-                              Expanded(
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<String>(
-                                    hint: Text(
-                                      "Year",
-                                      style: TextStyle(
-                                        color: isDark
-                                            ? Colors.white
-                                            : Colors.brown,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    value: selectedYear,
-                                    isExpanded: true,
-                                    dropdownColor: cardColor,
-                                    style: TextStyle(
-                                      color: isDark
-                                          ? Colors.white
-                                          : Colors.brown,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    iconEnabledColor: isDark
-                                        ? Colors.white
-                                        : Colors.brown,
-                                    items: availableYears
-                                        .map(
-                                          (year) => DropdownMenuItem(
-                                            value: year,
-                                            child: Text(year),
-                                          ),
-                                        )
-                                        .toList(),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        selectedYear = value;
-                                        applyFilters();
-                                      });
-                                    },
-                                  ),
+                                        );
+                                      },
+                                    );
+                                  },
                                 ),
                               ),
                             ],

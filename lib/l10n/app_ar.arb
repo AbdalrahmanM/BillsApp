@@ -25,7 +25,7 @@
   "requestBill": "طلب الفاتورة",
   "close": "إغلاق",
   "bills": "فواتير",
-  "announcements": "الإعلانات",
+  "announcements": "التبليغات",
   "maintenanceNoticeTitle": "إشعار\nالصيانة",
   "maintenanceNoticeDesc": "سيتم إجراء صيانة للنظام في نهاية هذا الأسبوع.",
   "newPaymentOptionTitle": "خيار دفع\nجديد",
@@ -51,5 +51,12 @@
   "billRequestSent": "تم إرسال طلب الفاتورة بنجاح!",
   "requestBill": "طلب فاتورة",
   "billRequestAlreadySent": "تم إرسال طلب لهذه الفاتورة مسبقاً!",
-  "billingHub": "مركز الفواتير"
+  "billingHub": "مركز الفواتير",
+  "all": "الكل",
+  "month": "الشهر",
+  "year": "السنة",
+  "filter":"فلتر",
+  "reset":"اعادة ضبط",
+  "apply":"تطبيق",
+  "cancel":"الغاء"
 }

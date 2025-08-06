@@ -50,5 +50,12 @@
   "billRequestSent": "Bill request sent successfully!",
   "requestBill": "Request Bill",
   "billRequestAlreadySent": "A request for this bill has already been sent!",
-  "billingHub": "Billing Hub"
+  "billingHub": "Billing Hub",
+  "all": "All",
+  "month": "Month",
+  "year": "Year",
+  "filter":"Filter",
+  "reset":"Reset",
+  "apply":"Apply",
+  "cancel":"Cancel"
 }

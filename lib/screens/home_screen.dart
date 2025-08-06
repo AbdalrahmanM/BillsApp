@@ -290,7 +290,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        "Billing Hub",
+                        AppLocalizations.of(context)!.billingHub,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 22,
@@ -528,7 +528,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: Colors.black.withOpacity(0.25),
                               alignment: Alignment.center,
                               child: Text(
-                                'Ads',
+                                AppLocalizations.of(context)!.ads, // بدل 'Ads'
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 32,
