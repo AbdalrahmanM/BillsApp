@@ -32,11 +32,13 @@ class MyApp extends StatelessWidget {
                 brightness: Brightness.light,
                 primarySwatch: Colors.brown,
                 scaffoldBackgroundColor: Color(0xFFFAEBD7),
+                fontFamily: 'Almarai', // <-- أضف هذا السطر
               ),
               darkTheme: ThemeData(
                 brightness: Brightness.dark,
                 primarySwatch: Colors.brown,
                 scaffoldBackgroundColor: Color(0xFF232323),
+                fontFamily: 'Almarai', // <-- أضف هذا السطر
               ),
               themeMode: mode,
               home: LoginScreen(localeNotifier: localeNotifier),

@@ -237,106 +237,249 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(16),
                                     ),
-                                    padding: const EdgeInsets.symmetric(vertical: 14),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
                                   ),
                                   icon: const Icon(Icons.filter_alt_rounded),
                                   label: Text(loc.filter),
                                   onPressed: () async {
                                     await showModalBottomSheet(
                                       context: context,
+                                      isScrollControlled:
+                                          true, // <-- أضف هذا السطر
                                       shape: const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                                        borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(28),
+                                        ),
                                       ),
-                                      backgroundColor: isDark ? cardColor : Colors.white,
+                                      backgroundColor: isDark
+                                          ? cardColor
+                                          : Colors.white,
                                       builder: (context) {
                                         String tempStatus = selectedStatus;
                                         String? tempMonth = selectedMonth;
                                         String? tempYear = selectedYear;
-                                        return StatefulBuilder(
-                                          builder: (context, setModalState) => Padding(
-                                            padding: const EdgeInsets.all(24.0),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(loc.filter, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: isDark ? Colors.white : Colors.brown)),
-                                                const SizedBox(height: 18),
-                                                Text(loc.status, style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.brown)),
-                                                Wrap(
-                                                  spacing: 10,
-                                                  children: [
-                                                    ChoiceChip(
-                                                      label: Text(loc.all),
-                                                      selected: tempStatus == 'all',
-                                                      onSelected: (_) => setModalState(() => tempStatus = 'all'),
-                                                    ),
-                                                    ChoiceChip(
-                                                      label: Text(loc.paid),
-                                                      selected: tempStatus == 'paid',
-                                                      onSelected: (_) => setModalState(() => tempStatus = 'paid'),
-                                                    ),
-                                                    ChoiceChip(
-                                                      label: Text(loc.unpaid),
-                                                      selected: tempStatus == 'unpaid',
-                                                      onSelected: (_) => setModalState(() => tempStatus = 'unpaid'),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const SizedBox(height: 18),
-                                                Text(loc.month, style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.brown)),
-                                                Wrap(
-                                                  spacing: 8,
-                                                  children: monthNames.map((month) => ChoiceChip(
-                                                    label: Text(month),
-                                                    selected: tempMonth == month,
-                                                    onSelected: (_) => setModalState(() => tempMonth = tempMonth == month ? null : month),
-                                                  )).toList(),
-                                                ),
-                                                const SizedBox(height: 18),
-                                                Text(loc.year, style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.brown)),
-                                                Wrap(
-                                                  spacing: 8,
-                                                  children: availableYears.map((year) => ChoiceChip(
-                                                    label: Text(year),
-                                                    selected: tempYear == year,
-                                                    onSelected: (_) => setModalState(() => tempYear = tempYear == year ? null : year),
-                                                  )).toList(),
-                                                ),
-                                                const SizedBox(height: 24),
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: OutlinedButton(
-                                                        onPressed: () {
-                                                          Navigator.pop(context);
-                                                        },
-                                                        child: Text(loc.cancel),
-                                                      ),
-                                                    ),
-                                                    const SizedBox(width: 12),
-                                                    Expanded(
-                                                      child: ElevatedButton(
-                                                        style: ElevatedButton.styleFrom(
-                                                          backgroundColor: Colors.brown,
-                                                          foregroundColor: Colors.white,
+                                        return DraggableScrollableSheet(
+                                          expand: false,
+                                          initialChildSize: 0.7,
+                                          minChildSize: 0.4,
+                                          maxChildSize: 0.95,
+                                          builder: (context, scrollController) {
+                                            return StatefulBuilder(
+                                              builder: (context, setModalState) => SingleChildScrollView(
+                                                controller: scrollController,
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(
+                                                    24.0,
+                                                  ),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        loc.filter,
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 20,
+                                                          color: isDark
+                                                              ? Colors.white
+                                                              : Colors.brown,
                                                         ),
-                                                        onPressed: () {
-                                                          setState(() {
-                                                            selectedStatus = tempStatus;
-                                                            selectedMonth = tempMonth;
-                                                            selectedYear = tempYear;
-                                                            applyFilters();
-                                                          });
-                                                          Navigator.pop(context);
-                                                        },
-                                                        child: Text(loc.apply),
                                                       ),
-                                                    ),
-                                                  ],
+                                                      const SizedBox(
+                                                        height: 18,
+                                                      ),
+                                                      Text(
+                                                        loc.status,
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: isDark
+                                                              ? Colors.white
+                                                              : Colors.brown,
+                                                        ),
+                                                      ),
+                                                      Wrap(
+                                                        spacing: 10,
+                                                        children: [
+                                                          ChoiceChip(
+                                                            label: Text(
+                                                              loc.all,
+                                                            ),
+                                                            selected:
+                                                                tempStatus ==
+                                                                'all',
+                                                            onSelected: (_) =>
+                                                                setModalState(
+                                                                  () =>
+                                                                      tempStatus =
+                                                                          'all',
+                                                                ),
+                                                          ),
+                                                          ChoiceChip(
+                                                            label: Text(
+                                                              loc.paid,
+                                                            ),
+                                                            selected:
+                                                                tempStatus ==
+                                                                'paid',
+                                                            onSelected: (_) =>
+                                                                setModalState(
+                                                                  () =>
+                                                                      tempStatus =
+                                                                          'paid',
+                                                                ),
+                                                          ),
+                                                          ChoiceChip(
+                                                            label: Text(
+                                                              loc.unpaid,
+                                                            ),
+                                                            selected:
+                                                                tempStatus ==
+                                                                'unpaid',
+                                                            onSelected: (_) =>
+                                                                setModalState(
+                                                                  () => tempStatus =
+                                                                      'unpaid',
+                                                                ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 18,
+                                                      ),
+                                                      Text(
+                                                        loc.month,
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: isDark
+                                                              ? Colors.white
+                                                              : Colors.brown,
+                                                        ),
+                                                      ),
+                                                      Wrap(
+                                                        spacing: 8,
+                                                        children: monthNames
+                                                            .map(
+                                                              (
+                                                                month,
+                                                              ) => ChoiceChip(
+                                                                label: Text(
+                                                                  month,
+                                                                ),
+                                                                selected:
+                                                                    tempMonth ==
+                                                                    month,
+                                                                onSelected: (_) => setModalState(
+                                                                  () => tempMonth =
+                                                                      tempMonth ==
+                                                                          month
+                                                                      ? null
+                                                                      : month,
+                                                                ),
+                                                              ),
+                                                            )
+                                                            .toList(),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 18,
+                                                      ),
+                                                      Text(
+                                                        loc.year,
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: isDark
+                                                              ? Colors.white
+                                                              : Colors.brown,
+                                                        ),
+                                                      ),
+                                                      Wrap(
+                                                        spacing: 8,
+                                                        children: availableYears
+                                                            .map(
+                                                              (
+                                                                year,
+                                                              ) => ChoiceChip(
+                                                                label: Text(
+                                                                  year,
+                                                                ),
+                                                                selected:
+                                                                    tempYear ==
+                                                                    year,
+                                                                onSelected: (_) =>
+                                                                    setModalState(
+                                                                      () => tempYear =
+                                                                          tempYear ==
+                                                                              year
+                                                                          ? null
+                                                                          : year,
+                                                                    ),
+                                                              ),
+                                                            )
+                                                            .toList(),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 24,
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Expanded(
+                                                            child: OutlinedButton(
+                                                              onPressed: () {
+                                                                Navigator.pop(
+                                                                  context,
+                                                                );
+                                                              },
+                                                              child: Text(
+                                                                loc.cancel,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 12,
+                                                          ),
+                                                          Expanded(
+                                                            child: ElevatedButton(
+                                                              style: ElevatedButton.styleFrom(
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .brown,
+                                                                foregroundColor:
+                                                                    Colors
+                                                                        .white,
+                                                              ),
+                                                              onPressed: () {
+                                                                setState(() {
+                                                                  selectedStatus =
+                                                                      tempStatus;
+                                                                  selectedMonth =
+                                                                      tempMonth;
+                                                                  selectedYear =
+                                                                      tempYear;
+                                                                  applyFilters();
+                                                                });
+                                                                Navigator.pop(
+                                                                  context,
+                                                                );
+                                                              },
+                                                              child: Text(
+                                                                loc.apply,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
-                                              ],
-                                            ),
-                                          ),
+                                              ),
+                                            );
+                                          },
                                         );
                                       },
                                     );
@@ -406,63 +549,96 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
       curve: Curves.easeInOut,
       margin: const EdgeInsets.only(bottom: 18),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(18),
+        gradient: LinearGradient(
+          colors: isPaid
+              ? [Colors.green.shade50, Colors.green.shade100]
+              : [Colors.red.shade50, Colors.red.shade100],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: Colors.brown.withOpacity(0.08),
-            blurRadius: 12,
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 16,
             offset: const Offset(0, 6),
           ),
         ],
         border: Border(
-          left: BorderSide(color: isPaid ? Colors.green : Colors.red, width: 6),
+          left: BorderSide(color: isPaid ? Colors.green : Colors.red, width: 5),
         ),
       ),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: isPaid ? Colors.green.shade100 : Colors.red.shade100,
-          child: Icon(
-            isPaid ? Icons.check_circle : Icons.error_outline,
-            color: isPaid ? Colors.green : Colors.red,
-          ),
-        ),
-        title: Padding(
-          padding: const EdgeInsets.only(bottom: 4.0),
-          child: Text(
-            localizedStatus,
-            style: TextStyle(
-              color: isPaid ? Colors.green : Colors.red,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-        ),
-        subtitle: Column(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // العنوان والأيقونة
             Row(
               children: [
+                CircleAvatar(
+                  radius: 22,
+                  backgroundColor: isPaid
+                      ? Colors.green.shade200
+                      : Colors.red.shade200,
+                  child: Icon(
+                    isPaid ? Icons.check_circle : Icons.error_outline,
+                    color: isPaid ? Colors.green : Colors.red,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    localizedStatus,
+                    style: TextStyle(
+                      color: isPaid
+                          ? Colors.green.shade800
+                          : Colors.red.shade800,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
                 Icon(
-                  Icons.attach_money,
-                  color: isDark ? Colors.brown.shade100 : Colors.brown.shade300,
-                  size: 20,
+                  Icons.arrow_forward_ios,
+                  color: Colors.brown.shade200,
+                  size: 18,
                 ),
-                Text(
-                  "${bill['amount']}",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: isDark ? Colors.white : Colors.black,
-                  ),
-                ),
-                Text(
-                  ":${loc.amount}",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: isDark ? Colors.white70 : Colors.brown,
-                  ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            // المبلغ والشهر والسنة
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.attach_money,
+                      color: Colors.brown.shade400,
+                      size: 18,
+                    ),
+                    Text(
+                      "${bill['amount']}",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
+                    ),
+                    Text(
+                      " ${loc.amount}",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                        color: isDark ? Colors.white70 : Colors.brown,
+                      ),
+                    ),
+                  ],
                 ),
                 if (year.isNotEmpty)
                   Chip(
@@ -471,14 +647,19 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                       style: TextStyle(
                         color: isDark ? Colors.white : Colors.brown,
                         fontWeight: FontWeight.w500,
+                        fontSize: 13,
                       ),
                     ),
                     backgroundColor: isDark
                         ? Colors.brown.shade800
                         : Colors.brown.shade50,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 0,
+                    ),
+                    visualDensity: VisualDensity.compact,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                if (year.isNotEmpty && monthName.isNotEmpty)
-                  const SizedBox(width: 8), // أضف هذا السطر للفصل بين الشيبس
                 if (monthName.isNotEmpty)
                   Chip(
                     label: Text(
@@ -486,29 +667,36 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                       style: TextStyle(
                         color: isDark ? Colors.white : Colors.brown,
                         fontWeight: FontWeight.w500,
+                        fontSize: 13,
                       ),
                     ),
                     backgroundColor: isDark
                         ? Colors.brown.shade800
                         : Colors.brown.shade50,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 0,
+                    ),
+                    visualDensity: VisualDensity.compact,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
               ],
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 10),
+            // الحالة
             Row(
               children: [
                 Icon(
                   Icons.info_outline,
-                  color: isDark ? Colors.brown.shade100 : Colors.brown.shade300,
-                  size: 18,
+                  color: Colors.brown.shade300,
+                  size: 17,
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  // Use localized status here!
                   isPaid ? loc.paid : loc.unpaid,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 20,
+                    fontSize: 15,
                     color: isDark ? Colors.white : Colors.black,
                   ),
                 ),
@@ -516,22 +704,13 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                   " :${loc.status}",
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    fontSize: 18,
+                    fontSize: 14,
                     color: isDark ? Colors.white70 : Colors.brown,
                   ),
                 ),
               ],
             ),
           ],
-        ),
-        trailing: Icon(
-          Icons.arrow_forward_ios,
-          color: Colors.brown.shade200,
-          size: 18,
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 12,
-          horizontal: 16,
         ),
       ),
     );

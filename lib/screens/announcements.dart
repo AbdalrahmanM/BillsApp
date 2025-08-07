@@ -1,4 +1,4 @@
-import 'dart:ui'; // أضف هذا السطر في الأعلى
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:bills_app/l10n/app_localizations.dart';
 
@@ -9,7 +9,9 @@ class AnnouncementsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? const Color(0xFF232323) : const Color(0xFFFDE9D9);
-    final loc = AppLocalizations.of(context)!; // Get localization instance
+    final loc = AppLocalizations.of(context)!;
+
+    final orientation = MediaQuery.of(context).orientation;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -32,61 +34,63 @@ class AnnouncementsScreen extends StatelessWidget {
               ],
             ),
           ),
-          // محتوى الشاشة
+
+          // المحتوى بالكامل قابل للتمرير
           SafeArea(
-            child: Column(
-              children: [
-                const SizedBox(height: 32),
-                Text(
-                  loc.announcements, // Localized
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: isDark
-                        ? Colors.lightBlueAccent
-                        : const Color(0xFF0070F3),
-                    letterSpacing: 1,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: GridView.count(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 24,
-                      crossAxisSpacing: 16,
-                      childAspectRatio: 0.85,
-                      children: [
-                        _AnnouncementCard(
-                          title: loc.maintenanceNoticeTitle,
-                          description: loc.maintenanceNoticeDesc,
-                          icon: null,
-                          iconColor: null,
-                        ),
-                        _AnnouncementCard(
-                          title: loc.newPaymentOptionTitle,
-                          description: loc.newPaymentOptionDesc,
-                          icon: Icons.account_balance_wallet_outlined,
-                          iconColor: const Color(0xFFBDBDBD),
-                        ),
-                        _AnnouncementCard(
-                          title: loc.specialOfferTitle,
-                          description: loc.specialOfferDesc,
-                          icon: Icons.percent,
-                          iconColor: const Color(0xFFFF8A65),
-                        ),
-                        _AnnouncementCard(
-                          title: loc.holidayAlertTitle,
-                          description: loc.holidayAlertDesc,
-                          icon: Icons.error_outline,
-                          iconColor: const Color(0xFFFFB300),
-                        ),
-                      ],
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    loc.announcements,
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: isDark
+                          ? Colors.lightBlueAccent
+                          : const Color(0xFF0070F3),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 24),
+
+                  // الشبكة القابلة للتكيف
+                  GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: orientation == Orientation.portrait ? 2 : 3,
+                    mainAxisSpacing: 24,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: 0.85,
+                    children: [
+                      _AnnouncementCard(
+                        title: loc.maintenanceNoticeTitle,
+                        description: loc.maintenanceNoticeDesc,
+                        icon: null,
+                        iconColor: null,
+                      ),
+                      _AnnouncementCard(
+                        title: loc.newPaymentOptionTitle,
+                        description: loc.newPaymentOptionDesc,
+                        icon: Icons.account_balance_wallet_outlined,
+                        iconColor: const Color(0xFFBDBDBD),
+                      ),
+                      _AnnouncementCard(
+                        title: loc.specialOfferTitle,
+                        description: loc.specialOfferDesc,
+                        icon: Icons.percent,
+                        iconColor: const Color(0xFFFF8A65),
+                      ),
+                      _AnnouncementCard(
+                        title: loc.holidayAlertTitle,
+                        description: loc.holidayAlertDesc,
+                        icon: Icons.error_outline,
+                        iconColor: const Color(0xFFFFB300),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -121,32 +125,40 @@ class _AnnouncementCard extends StatelessWidget {
         color: cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4)),
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 22,
-              color: textColor,
-              height: 1.2,
+          Flexible(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 18,
+                color: textColor,
+                height: 1.2,
+              ),
             ),
           ),
-          const SizedBox(height: 10),
-          Text(
-            description,
-            style: TextStyle(fontSize: 16, color: textColor, height: 1.3),
+          const SizedBox(height: 8),
+          Flexible(
+            child: Text(
+              description,
+              style: TextStyle(fontSize: 14, color: textColor, height: 1.3),
+            ),
           ),
           const Spacer(),
           if (icon != null)
             Align(
               alignment: Alignment.bottomRight,
-              child: Icon(icon, size: 44, color: iconColor ?? Colors.grey),
+              child: Icon(icon, size: 36, color: iconColor ?? Colors.grey),
             ),
         ],
       ),

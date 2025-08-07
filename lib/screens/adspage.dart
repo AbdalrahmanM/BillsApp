@@ -155,6 +155,7 @@ class AdsPage extends StatelessWidget {
       backgroundColor: isDark
           ? const Color(0xFF232323)
           : const Color(0xFFFDE9D9),
+      // أزل الـ Stack هنا
       body: Stack(
         children: [
           // الخلفية المغوشة
@@ -233,7 +234,9 @@ class AdsPage extends StatelessWidget {
                 const SizedBox(height: 16),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.only(bottom: 124.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 0,
+                    ), // أزل الـ bottom
                     child: GridView.count(
                       crossAxisCount: 2,
                       padding: const EdgeInsets.all(16),
@@ -267,105 +270,90 @@ class AdsPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                // الشريط السفلي الجديد (مطابق للرئيسية)
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      bottom: 18.0,
-                      left: 12.0,
-                      right: 12.0,
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      height: 64,
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFFFAFAFA).withOpacity(0.10)
-                            : Colors.white.withOpacity(0.85),
-                        borderRadius: BorderRadius.circular(32),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.07),
-                            blurRadius: 18,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          // زر الدعم
-                          Expanded(
-                            child: TextButton.icon(
-                              onPressed: () => _showHelpModal(context),
-                              icon: Icon(
-                                Icons.headset_mic,
-                                color: Colors.brown.shade700,
-                              ),
-                              label: Text(
-                                AppLocalizations.of(context)!.support,
-                                style: TextStyle(
-                                  color: Colors.brown.shade700,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              style: TextButton.styleFrom(
-                                foregroundColor: Colors.brown.shade700,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(32),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          // زر تسجيل الخروج
-                          Expanded(
-                            child: TextButton.icon(
-                              onPressed: () {
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => LoginScreen(
-                                      localeNotifier: localeNotifier,
-                                    ),
-                                  ),
-                                  (route) => false,
-                                );
-                              },
-                              icon: const Icon(Icons.logout, color: Colors.red),
-                              label: Text(
-                                AppLocalizations.of(context)!.logout,
-                                style: TextStyle(
-                                  color: Colors.red.shade700,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              style: TextButton.styleFrom(
-                                foregroundColor: Colors.red.shade700,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(32),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
         ],
+      ),
+      // أضف الشريط السفلي هنا
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(bottom: 18.0, left: 12.0, right: 12.0),
+        child: Container(
+          width: double.infinity,
+          height: 64,
+          decoration: BoxDecoration(
+            color: isDark
+                ? const Color(0xFFFAFAFA).withOpacity(0.10)
+                : Colors.white.withOpacity(0.85),
+            borderRadius: BorderRadius.circular(32),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.07),
+                blurRadius: 18,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              // زر الدعم
+              Expanded(
+                child: TextButton.icon(
+                  onPressed: () => _showHelpModal(context),
+                  icon: Icon(Icons.headset_mic, color: Colors.brown.shade700),
+                  label: Text(
+                    AppLocalizations.of(context)!.support,
+                    style: TextStyle(
+                      color: Colors.brown.shade700,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.brown.shade700,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              // زر تسجيل الخروج
+              Expanded(
+                child: TextButton.icon(
+                  onPressed: () {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            LoginScreen(localeNotifier: localeNotifier),
+                      ),
+                      (route) => false,
+                    );
+                  },
+                  icon: const Icon(Icons.logout, color: Colors.red),
+                  label: Text(
+                    AppLocalizations.of(context)!.logout,
+                    style: TextStyle(
+                      color: Colors.red.shade700,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red.shade700,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -410,7 +398,7 @@ class _AdCardState extends State<_AdCard> {
   }
 
   void _showAdDetails(BuildContext context) async {
-    setState(() => _isActive = true); // عند الفتح يصبح مغاير
+    setState(() => _isActive = true);
     await showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -421,87 +409,104 @@ class _AdCardState extends State<_AdCard> {
           child: Material(
             color: Colors.transparent,
             child: Container(
-              width: MediaQuery.of(context).size.width * 0.85,
-              height: MediaQuery.of(context).size.height * 0.55,
+              width: MediaQuery.of(context).size.width * 0.92,
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.75,
+                minHeight: 200,
+              ),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(28),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(28),
-                    ),
-                    child: Image.asset(
-                      widget.image,
-                      height: 180,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
-                    child: Column(
-                      children: [
-                        Text(
-                          widget.title,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 24,
-                            color: _currentTextColor,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          widget.subtitle,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: _currentTextColor.withOpacity(0.8),
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        if (widget.details.isNotEmpty) ...[
-                          const SizedBox(height: 12),
-                          Text(
-                            widget.details,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: Colors.brown,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                        const SizedBox(height: 24),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            // افتح الرابط في المتصفح
-                          },
-                          icon: const Icon(Icons.open_in_new),
-                          label: const Text('زيارة الموقع'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.brown,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 32,
-                              vertical: 12,
-                            ),
-                            textStyle: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                borderRadius: BorderRadius.circular(32),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.10),
+                    blurRadius: 24,
+                    offset: const Offset(0, 8),
                   ),
                 ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(32),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // الصورة
+                      ClipRRect(
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(32),
+                        ),
+                        child: Image.asset(
+                          widget.image,
+                          height: 170,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 18),
+                        child: Column(
+                          children: [
+                            Text(
+                              widget.title,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 22,
+                                color: Color(0xFF8D6E63),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              widget.subtitle,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                color: Color(0xFF8D6E63),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            if (widget.details.isNotEmpty) ...[
+                              const SizedBox(height: 12),
+                              Text(
+                                widget.details,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.brown,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                            const SizedBox(height: 24),
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                // افتح الرابط في المتصفح
+                              },
+                              icon: const Icon(Icons.open_in_new),
+                              label: const Text('زيارة الموقع'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF8D6E63),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 28,
+                                  vertical: 12,
+                                ),
+                                textStyle: const TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -514,7 +519,7 @@ class _AdCardState extends State<_AdCard> {
         );
       },
     );
-    setState(() => _isActive = false); // عند الإغلاق يعود اللون الطبيعي
+    setState(() => _isActive = false);
   }
 
   @override
@@ -559,14 +564,6 @@ class _AdCardState extends State<_AdCard> {
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                         color: _currentTextColor,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      widget.subtitle,
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: _currentTextColor.withOpacity(0.8),
                       ),
                     ),
                   ],
